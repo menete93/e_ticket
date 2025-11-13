@@ -12,7 +12,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <View style={globalStyles.container}>
       <Icon name="login" size={scaleFontSize(22)} color={'#25C0FF'} />
-      <Button title="Entrar" onPress={() => navigation.replace('Main')} />
+      {/* <Button title="Entrar" onPress={() => navigation.replace('Main')} /> */}
 
       <Login />
     </View>

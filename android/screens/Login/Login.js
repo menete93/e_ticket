@@ -7,20 +7,33 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { auth } from './../../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import InputField from './../../components/Input/InputField';
 import colors from './style';
 
-export default function LoginScreen() {
-  const [email, setEmail] = useState('');
+export default function LoginScreen({ navigation }) {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
-      return;
-    }
+  const handleLogin = async () => {
+    try {
+      const response = await auth.post('/auth/login', { username, password });
+      const { token, user } = response.data;
+      console.log(response.data, 'token');
 
-    Alert.alert('Login', `Bem-vindo, ${email}!`);
+      // Armazena token e usuário
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      await AsyncStorage.setItem('token', token);
+      Alert.alert('Login efetuado com sucesso!');
+      navigation.replace('Main'); // 🔁 redireciona para o Drawer principal
+      console.log(response.data.user, 'token');
+    } catch (error) {
+      console.log(error.response?.data || error.message);
+      Alert.alert('Erro ao autenticar', 'Verifique suas credenciais.');
+    }
   };
 
   return (
@@ -36,10 +49,10 @@ export default function LoginScreen() {
 
       <View style={styles.form}>
         <InputField
-          label="Email"
+          label="Username"
           placeholder="exemplo@email.com"
-          value={email}
-          onChangeText={setEmail}
+          value={username}
+          onChangeText={setUsername}
         />
         <InputField
           label="Senha"

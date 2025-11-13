@@ -5,12 +5,16 @@ import MainTabs from './MainTabs';
 import SettingsScreen from '../screens/SettingsScreen';
 import colors from '../theme/colors';
 import CategoryRegistry from './../screens/CategoriesRegistry/CategoryRegistry';
+import EventScreen from './../screens/EventScreen/EventScreen';
+import HomeScreen from '../screens/HomeScreen/HomeScreen';
+import CustomDrawerContent from './../components/CustomDrawerContent/CustomDrawerContent';
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigator() {
   return (
     <Drawer.Navigator
+      drawerContent={props => <CustomDrawerContent {...props} />} // <--- adiciona aqui
       screenOptions={{
         headerStyle: { backgroundColor: colors.surface },
         headerTintColor: colors.textPrimary,
@@ -21,7 +25,7 @@ export default function DrawerNavigator() {
     >
       <Drawer.Screen
         name="Principal"
-        component={MainTabs}
+        component={HomeScreen}
         options={{
           // eslint-disable-next-line react/no-unstable-nested-components
           drawerIcon: ({ color, size }) => (
@@ -42,8 +46,18 @@ export default function DrawerNavigator() {
       />
 
       <Drawer.Screen
-        name="Adicionar evento"
+        name="Adicionar categoria"
         component={CategoryRegistry}
+        options={{
+          // eslint-disable-next-line react/no-unstable-nested-components
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Adicionar evento"
+        component={EventScreen}
         options={{
           // eslint-disable-next-line react/no-unstable-nested-components
           drawerIcon: ({ color, size }) => (

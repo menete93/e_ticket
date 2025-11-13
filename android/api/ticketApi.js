@@ -30,3 +30,38 @@ export const createCategory = async data => {
     throw error;
   }
 };
+
+/**
+ * Buscar lugares via OpenStreetMap / Nominatim
+ * @param {string} query - Nome ou endereço do local
+ * @returns {Promise<Array>} - Lista de resultados
+ */
+export const searchPlace = async query => {
+  if (!query) return [];
+  try {
+    const response = await axios.get(
+      'https://nominatim.openstreetmap.org/search',
+      {
+        params: {
+          q: query,
+          format: 'json',
+          addressdetails: 1,
+          limit: 5,
+          countrycodes: 'mz', // FILTRA RESULTADOS PARA MOÇAMBIQUE
+        },
+        headers: {
+          'User-Agent': 'e_ticket_app/1.0 (menete93@gmail.com)',
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    // Substitui console.error por alert ou global.console.error
+    if (global.console && typeof global.console.error === 'function') {
+      global.console.error('Erro ao buscar lugar:', error);
+    } else {
+      alert('Erro ao buscar lugar: ' + error.message);
+    }
+    return [];
+  }
+};

@@ -3,7 +3,7 @@ import { verticalScale } from './scaling';
 
 const globalStyle = StyleSheet.create({
   backgroundWhite: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#491010ff',
   },
   flex: {
     flex: 1,
