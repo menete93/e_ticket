@@ -1,15 +1,15 @@
-import api from './../api/ticketApi';
+import { api } from './../services/api';
 
 // 🔹 Lista todos os eventos
-export const getEvents = () => api.get('/events');
+export const getEvents = () => api.get('/event');
 
 // 🔹 Busca evento por ID
-export const getEventById = id => api.get(`/events/${id}`);
+export const getEventById = id => api.get(`/event/${id}`);
 
 // 🔹 Cria um novo evento
 export const createEvent = async eventData => {
   try {
-    const response = await api.post('/events', eventData);
+    const response = await api.post('/event', eventData);
     return response.data;
   } catch (error) {
     console.error(
@@ -21,7 +21,7 @@ export const createEvent = async eventData => {
 };
 
 // 🔹 Atualiza evento existente
-export const updateEvent = (id, data) => api.put(`/events/${id}`, data);
+export const updateEvent = (id, data) => api.put(`/event/${id}`, data);
 
 // 🔹 Deleta evento
-export const deleteEvent = id => api.delete(`/events/${id}`);
+export const deleteEvent = id => api.delete(`/event/${id}`);

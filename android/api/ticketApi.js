@@ -2,14 +2,14 @@ import axios from 'axios';
 import { Alert } from 'react-native';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // URL da sua API Spring Boot
+  baseURL: 'http://10.0.2.2:8085/e-ticket', // coloque o endpoint da sua API
 });
 
-export const getTickets = () => api.get('/tickets');
-export const getTicketById = id => api.get(`/tickets/${id}`);
-export const createTicket = data => api.post('/tickets', data);
-export const updateTicket = (id, data) => api.put(`/tickets/${id}`, data);
-export const deleteTicket = id => api.delete(`/tickets/${id}`);
+export const getTickets = () => api.get('/e-ticket');
+export const getTicketById = id => api.get(`/e-ticket/${id}`);
+export const createTicket = data => api.post('/event', data);
+export const updateTicket = (id, data) => api.put(`/e-ticket/${id}`, data);
+export const deleteTicket = id => api.delete(`/e-ticket/${id}`);
 
 /**
  * Função para criar uma categoria no backend

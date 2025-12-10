@@ -8,6 +8,7 @@ import CategoryRegistry from './../screens/CategoriesRegistry/CategoryRegistry';
 import EventScreen from './../screens/EventScreen/EventScreen';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import CustomDrawerContent from './../components/CustomDrawerContent/CustomDrawerContent';
+import EventRegistrationScreen from './../screens/EventRegistry/EventRegistry';
 
 const Drawer = createDrawerNavigator();
 
@@ -58,6 +59,17 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="Adicionar evento"
         component={EventScreen}
+        options={{
+          // eslint-disable-next-line react/no-unstable-nested-components
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" color={color} size={size} />
+          ),
+        }}
+      />
+
+      <Drawer.Screen
+        name="Adicionar Event"
+        component={EventRegistrationScreen}
         options={{
           // eslint-disable-next-line react/no-unstable-nested-components
           drawerIcon: ({ color, size }) => (
