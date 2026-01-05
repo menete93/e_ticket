@@ -184,6 +184,7 @@ const style = StyleSheet.create({
     borderColor: '#CCC',
     borderRadius: 5,
     overflow: 'hidden',
+    height: 100, // 🔽 diminui a altura do mapa
   },
 
   mapHint: {
@@ -200,6 +201,13 @@ const style = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ccc',
+  },
+
+  map: {
+    width: '100%',
+    height: 220,
+    borderRadius: 10,
+    flex: 1,
   },
 
   optionText: {
