@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { createEvent } from './../../services/eventService';
 import { searchPlace } from './../../api/ticketApi';
 import storage from '@react-native-firebase/storage';
-import RNFS from 'react-native-fs'; // precisa instalar: npm install react-native-fs
+import RNFS from 'react-native-fs';
 import MapLibreGL from '@maplibre/maplibre-react-native';
-// import MapView, { Marker, UrlTile } from 'react-native-maps';
-
 import {
   View,
   Text,
@@ -26,17 +24,21 @@ import styles from './style';
 
 MapLibreGL.setAccessToken(null);
 
-const EventRegistrationScreen = () => {
-  // Estados para os campos do evento - todos inicializados vazios
+const EventRegistrationScreen = ({ navigation, route }) => {
+  // Estados principais
+  const [createdEventId, setCreatedEventId] = useState(null); // Novo: ID do evento criado
+  const [ticketConfig, setTicketConfig] = useState([]);
+
+  // Estados para os campos do evento
   const [eventData, setEventData] = useState({
     name: '',
     description: '',
     latitude: null,
     longitude: null,
     categoryId: '',
-    eventDate: null, // Alterado para null
-    startTime: null, // Alterado para null
-    endTime: null, // Alterado para null
+    eventDate: null,
+    startTime: null,
+    endTime: null,
     coverImage: null,
     bannerImage: null,
     maxAttendees: '',
@@ -44,11 +46,11 @@ const EventRegistrationScreen = () => {
     isPublic: true,
     isFeatured: false,
     isFree: true,
-    registrationDeadline: null, // Alterado para null
+    registrationDeadline: null,
     location: '',
   });
 
-  // Estados para controlar os pickers
+  // Outros estados
   const [categories, setCategories] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -63,6 +65,7 @@ const EventRegistrationScreen = () => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
 
+  // Carregar categorias
   const fetchCategories = async () => {
     try {
       const response = await getCategories();
@@ -78,16 +81,7 @@ const EventRegistrationScreen = () => {
     fetchCategories();
   }, []);
 
-  // ─── HANDLERS ────────────────────────────────────────────
-  // const handleChangeCategory = (index, field, value) => {
-  //   const updated = [...categories];
-  //   updated[index][field] = value;
-  //   setCategories(updated);
-  // };
-
-  // Função de upload para Firebase
-  // Função de upload para Firebase - VERSÃO CORRIGIDA
-  // NOVA função de upload com verificação
+  // ─── FUNÇÕES DE UPLOAD DE IMAGENS ─────────────────────────────────
   const uploadImageToFirebaseWithVerification = async (
     image,
     imageType,
@@ -100,7 +94,6 @@ const EventRegistrationScreen = () => {
       return null;
     }
 
-    // Verificar se a imagem existe localmente
     try {
       const fileInfo = await RNFS.stat(image.uri.replace('file://', ''));
       console.log(
@@ -108,7 +101,6 @@ const EventRegistrationScreen = () => {
       );
 
       if (fileInfo.size > 5 * 1024 * 1024) {
-        // 5MB
         throw new Error('Arquivo muito grande (máximo 5MB)');
       }
     } catch (error) {
@@ -118,7 +110,6 @@ const EventRegistrationScreen = () => {
     try {
       let filePath = image.uri;
 
-      // Ajustar caminho para Android
       if (Platform.OS === 'android' && filePath.startsWith('content://')) {
         const destPath = `${
           RNFS.TemporaryDirectoryPath
@@ -129,7 +120,6 @@ const EventRegistrationScreen = () => {
         filePath = filePath.replace('file://', '');
       }
 
-      // Criar referência única
       const timestamp = Date.now();
       const randomId = Math.random().toString(36).substring(7);
       const filename = `${imageType}_${timestamp}_${randomId}.jpg`;
@@ -138,7 +128,6 @@ const EventRegistrationScreen = () => {
 
       console.log(`${imageType}: Enviando para ${storagePath}`);
 
-      // Upload com Promise
       const downloadURL = await new Promise((resolve, reject) => {
         const uploadTask = reference.putFile(filePath);
 
@@ -159,20 +148,8 @@ const EventRegistrationScreen = () => {
           async () => {
             try {
               console.log(`${imageType}: Upload completo, obtendo URL...`);
-
-              // Aguardar um pouco para garantir processamento
               await new Promise(resolve => setTimeout(resolve, 500));
-
-              // Obter URL
               const url = await reference.getDownloadURL();
-
-              // Verificar se a URL é acessível
-              console.log(`${imageType}: URL obtida, verificando...`);
-              const testResponse = await fetch(url);
-              if (!testResponse.ok) {
-                throw new Error(`URL não acessível: ${testResponse.status}`);
-              }
-
               console.log(`${imageType}: Upload validado com sucesso!`);
               resolve(url);
             } catch (urlError) {
@@ -189,7 +166,8 @@ const EventRegistrationScreen = () => {
       throw error;
     }
   };
-  // Opções para o seletor de imagens
+
+  // ─── SELEÇÃO DE IMAGENS ──────────────────────────────────────────
   const imageOptions = {
     mediaType: 'photo',
     quality: 0.8,
@@ -199,7 +177,6 @@ const EventRegistrationScreen = () => {
     selectionLimit: 1,
   };
 
-  // Função para selecionar imagem da galeria
   const selectImage = async imageType => {
     try {
       const result = await launchImageLibrary(imageOptions);
@@ -236,7 +213,6 @@ const EventRegistrationScreen = () => {
     }
   };
 
-  // Função para tirar foto com a câmera
   const takePhoto = async imageType => {
     try {
       const result = await launchCamera(imageOptions);
@@ -270,7 +246,6 @@ const EventRegistrationScreen = () => {
     }
   };
 
-  // Menu de opções para upload de imagem
   const showImageOptions = imageType => {
     Alert.alert('Selecionar Imagem', 'Escolha uma opção:', [
       {
@@ -288,7 +263,6 @@ const EventRegistrationScreen = () => {
     ]);
   };
 
-  // Função para remover imagem
   const removeImage = imageType => {
     setEventData({
       ...eventData,
@@ -296,47 +270,7 @@ const EventRegistrationScreen = () => {
     });
   };
 
-  // Função para simular upload
-  // const uploadImageToServer = async image => {
-  //   if (!image) return null;
-
-  //   setUploading(true);
-  //   setUploadProgress(0);
-
-  //   try {
-  //     const progressInterval = setInterval(() => {
-  //       setUploadProgress(prev => {
-  //         const newProgress = prev + 10;
-  //         if (newProgress >= 100) {
-  //           clearInterval(progressInterval);
-  //           return 100;
-  //         }
-  //         return newProgress;
-  //       });
-  //     }, 200);
-
-  //     // Simulando upload
-  //     await new Promise(resolve => setTimeout(resolve, 2000));
-
-  //     clearInterval(progressInterval);
-  //     setUploadProgress(100);
-
-  //     // URL simulada do servidor
-  //     const imageUrl = `https://seuservidor.com/images/${Date.now()}.jpg`;
-
-  //     setUploading(false);
-  //     setUploadProgress(0);
-
-  //     return imageUrl;
-  //   } catch (error) {
-  //     console.error('Upload error:', error);
-  //     setUploading(false);
-  //     setUploadProgress(0);
-  //     throw error;
-  //   }
-  // };
-
-  // Manipuladores de data/hora corrigidos
+  // ─── HANDLERS DE DATA/HORA ──────────────────────────────────────
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || new Date();
 
@@ -351,22 +285,6 @@ const EventRegistrationScreen = () => {
       setShowEndTimePicker(false);
       setShowDeadlinePicker(false);
     }
-  };
-
-  const openInGoogleMaps = () => {
-    if (!latitude || !longitude) return;
-
-    const lat = latitude;
-    const lon = longitude;
-
-    const url = Platform.select({
-      android: `geo:${lat},${lon}?q=${lat},${lon}`,
-      ios: `https://maps.google.com/?q=${lat},${lon}`,
-    });
-
-    Linking.openURL(url).catch(err =>
-      Alert.alert('Erro', 'Não foi possível abrir o Google Maps'),
-    );
   };
 
   const showPicker = field => {
@@ -387,7 +305,7 @@ const EventRegistrationScreen = () => {
     }
   };
 
-  // Formatadores de data/hora com verificação
+  // Formatadores
   const formatDate = date => {
     if (!date) return 'Selecionar data';
     return date.toLocaleDateString('pt-BR');
@@ -401,43 +319,66 @@ const EventRegistrationScreen = () => {
     });
   };
 
-  // Manipulador de envio
-  // NOVO handleSubmit com verificação completa
-  const handleSubmit = async () => {
-    console.log('🚀 Iniciando processo de criação de evento...');
+  // ─── NAVEGAÇÃO PARA CONFIGURAÇÃO DE BILHETES ───────────────────
+  const navigateToTicketConfig = eventId => {
+    if (navigation) {
+      navigation.navigate('TicketConfiguration', {
+        eventId: eventId,
+        eventName: eventData.name,
+        isFree: eventData.isFree,
+      });
+    } else {
+      Alert.alert('Info', 'Navegação não disponível');
+    }
+  };
 
-    // Validação básica
+  // ─── VALIDAÇÃO ─────────────────────────────────────────────────
+  const validateEventData = () => {
+    const errors = [];
+
     if (!eventData.name?.trim()) {
-      Alert.alert('Erro', 'Por favor, informe o nome do evento');
-      return;
+      errors.push('Nome do evento');
     }
 
     if (!eventData.description?.trim()) {
-      Alert.alert('Erro', 'Por favor, informe a descrição do evento');
-      return;
+      errors.push('Descrição do evento');
     }
 
     if (!eventData.latitude || !eventData.longitude) {
-      Alert.alert('Erro', 'Por favor, selecione uma localização');
-      return;
+      errors.push('Localização');
     }
 
     if (!eventData.eventDate) {
-      Alert.alert('Erro', 'Por favor, selecione a data do evento');
-      return;
+      errors.push('Data do evento');
     }
 
     if (!eventData.startTime || !eventData.endTime) {
-      Alert.alert(
-        'Erro',
-        'Por favor, selecione os horários de início e término',
-      );
-      return;
+      errors.push('Horários de início e término');
     }
 
-    // Validação de horário
     if (eventData.startTime >= eventData.endTime) {
-      Alert.alert('Erro', 'O horário de início deve ser anterior ao término');
+      errors.push('Horário de início deve ser anterior ao término');
+    }
+
+    if (!selectedCategoryId) {
+      errors.push('Categoria');
+    }
+
+    return errors;
+  };
+
+  // ─── CADASTRAR EVENTO ──────────────────────────────────────────
+  const handleSubmit = async () => {
+    console.log('🚀 Iniciando criação de evento...');
+
+    const errors = validateEventData();
+
+    if (errors.length > 0) {
+      Alert.alert(
+        'Campos obrigatórios',
+        `Por favor, preencha:\n\n• ${errors.join('\n• ')}`,
+        [{ text: 'OK' }],
+      );
       return;
     }
 
@@ -445,70 +386,27 @@ const EventRegistrationScreen = () => {
       setUploading(true);
       setUploadProgress(0);
 
-      console.log('📸 Iniciando uploads de imagens...');
-
+      // Upload de imagens
       let coverImageUrl = null;
       let bannerImageUrl = null;
-      let uploadErrors = [];
 
-      // Upload da capa com validação
       if (eventData.coverImage) {
-        console.log('1. Upload da imagem de capa...');
-        try {
-          coverImageUrl = await uploadImageToFirebaseWithVerification(
-            eventData.coverImage,
-            'cover',
-            setUploadProgress,
-          );
-          console.log(
-            '✅ Capa enviada:',
-            coverImageUrl?.substring(0, 50) + '...',
-          );
-        } catch (error) {
-          console.error('❌ Erro na capa:', error.message);
-          uploadErrors.push('capa');
-        }
-      }
-
-      // Upload do banner com validação
-      if (eventData.bannerImage) {
-        console.log('2. Upload do banner...');
-        try {
-          bannerImageUrl = await uploadImageToFirebaseWithVerification(
-            eventData.bannerImage,
-            'banner',
-            setUploadProgress,
-          );
-          console.log(
-            '✅ Banner enviado:',
-            bannerImageUrl?.substring(0, 50) + '...',
-          );
-        } catch (error) {
-          console.error('❌ Erro no banner:', error.message);
-          uploadErrors.push('banner');
-        }
-      }
-
-      // Verificar se algum upload falhou
-      if (uploadErrors.length > 0) {
-        Alert.alert(
-          'Atenção',
-          `Falha no upload das imagens: ${uploadErrors.join(
-            ', ',
-          )}. Deseja continuar sem as imagens?`,
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            {
-              text: 'Continuar',
-              onPress: () => criarEventoSemImagens(),
-            },
-          ],
+        coverImageUrl = await uploadImageToFirebaseWithVerification(
+          eventData.coverImage,
+          'cover',
+          setUploadProgress,
         );
-        setUploading(false);
-        return;
       }
 
-      // Criar payload
+      if (eventData.bannerImage) {
+        bannerImageUrl = await uploadImageToFirebaseWithVerification(
+          eventData.bannerImage,
+          'banner',
+          setUploadProgress,
+        );
+      }
+
+      // Preparar payload do evento
       const payload = {
         name: eventData.name.trim(),
         description: eventData.description.trim(),
@@ -537,23 +435,53 @@ const EventRegistrationScreen = () => {
         updatedAt: new Date().toISOString(),
       };
 
-      console.log('📦 Payload preparado:', JSON.stringify(payload, null, 2));
+      console.log('📦 Payload do Evento:', JSON.stringify(payload, null, 2));
 
-      // Enviar para API
-      console.log('3. Enviando para API...');
+      // Criar evento na API
       const response = await createEvent(payload);
-      console.log('✅ Evento criado com ID:', response?.id || 'sucesso');
+      console.log('✅ Evento criado com sucesso! ID:', response);
 
-      Alert.alert('✅ Sucesso!', 'Evento criado com sucesso!', [
-        { text: 'OK', onPress: resetForm },
-      ]);
+      // Salvar o ID do evento criado
+      setCreatedEventId(response.id);
+
+      // Se evento é gratuito, finaliza aqui
+      if (eventData.isFree) {
+        Alert.alert('✅ Sucesso!', 'Evento gratuito criado com sucesso!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              resetForm();
+              if (navigation) {
+                navigation.goBack();
+              }
+            },
+          },
+        ]);
+      } else {
+        // Se evento é pago, oferece opção de configurar bilhetes
+        Alert.alert(
+          '✅ Evento Criado!',
+          `Evento "${eventData.name}" criado com sucesso!\n\nDeseja configurar as categorias de bilhetes agora?`,
+          [
+            {
+              text: 'Mais Tarde',
+              style: 'cancel',
+              onPress: () => {
+                resetForm();
+                if (navigation) {
+                  navigation.goBack();
+                }
+              },
+            },
+            {
+              text: 'Configurar Bilhetes',
+              onPress: () => navigateToTicketConfig(response.id),
+            },
+          ],
+        );
+      }
     } catch (error) {
-      console.error('💥 Erro completo:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack,
-      });
-
+      console.error('💥 Erro:', error);
       Alert.alert(
         'Erro',
         `Falha ao criar evento: ${error.message || 'Erro desconhecido'}`,
@@ -565,50 +493,7 @@ const EventRegistrationScreen = () => {
     }
   };
 
-  // Função para criar evento sem imagens
-  const criarEventoSemImagens = async () => {
-    try {
-      setUploading(true);
-
-      const payload = {
-        name: eventData.name.trim(),
-        description: eventData.description.trim(),
-        geographicLocation: {
-          type: 'Point',
-          coordinates: [
-            parseFloat(eventData.longitude),
-            parseFloat(eventData.latitude),
-          ],
-        },
-        categoryId: selectedCategoryId,
-        eventDate: eventData.eventDate.toISOString(),
-        startTime: eventData.startTime.toISOString(),
-        endTime: eventData.endTime.toISOString(),
-        maxAttendees: eventData.maxAttendees || null,
-        minAttendees: eventData.minAttendees || null,
-        isPublic: eventData.isPublic,
-        isFeatured: eventData.isFeatured,
-        isFree: eventData.isFree,
-        registrationDeadline: eventData.registrationDeadline
-          ? eventData.registrationDeadline.toISOString()
-          : null,
-        coverImageUrl: null,
-        bannerImageUrl: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      await createEvent(payload);
-      Alert.alert('✅ Sucesso!', 'Evento criado sem imagens');
-      resetForm();
-    } catch (error) {
-      Alert.alert('Erro', 'Falha ao criar evento');
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  // Função de reset
+  // ─── FUNÇÕES AUXILIARES ────────────────────────────────────────
   const resetForm = () => {
     setEventData({
       name: '',
@@ -634,16 +519,31 @@ const EventRegistrationScreen = () => {
     setLatitude(null);
     setLongitude(null);
     setSearchResults([]);
+    setCreatedEventId(null);
   };
 
-  //ONDE TERMINA O HANDLESUBMIT
+  const openInGoogleMaps = () => {
+    if (!latitude || !longitude) return;
+
+    const lat = latitude;
+    const lon = longitude;
+
+    const url = Platform.select({
+      android: `geo:${lat},${lon}?q=${lat},${lon}`,
+      ios: `https://maps.google.com/?q=${lat},${lon}`,
+    });
+
+    Linking.openURL(url).catch(err =>
+      Alert.alert('Erro', 'Não foi possível abrir o Google Maps'),
+    );
+  };
+
   const handleSearchPlace = async text => {
     setPlaceQuery(text);
     if (text.length > 2) {
       try {
         const results = await searchPlace(text);
         setSearchResults(results);
-        console.log(results, 'LOCALIZACAO');
       } catch (error) {
         console.error('Erro ao buscar local:', error);
       }
@@ -652,7 +552,7 @@ const EventRegistrationScreen = () => {
     }
   };
 
-  // Componente para campos de texto
+  // ─── COMPONENTES DE RENDERIZAÇÃO ───────────────────────────────
   const renderTextInput = (
     label,
     value,
@@ -676,7 +576,6 @@ const EventRegistrationScreen = () => {
     </View>
   );
 
-  // Componente para switches
   const renderSwitch = (label, value, field) => (
     <View style={styles.switchContainer}>
       <Text style={styles.label}>{label}</Text>
@@ -690,7 +589,6 @@ const EventRegistrationScreen = () => {
     </View>
   );
 
-  // Componente para botões de data/hora corrigido
   const renderDateTimeButton = (label, date, time, field) => (
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label} *</Text>
@@ -706,7 +604,6 @@ const EventRegistrationScreen = () => {
     </View>
   );
 
-  // Componente para upload de imagem
   const renderImageUpload = (label, image, imageType) => (
     <View style={styles.inputContainer}>
       <Text style={styles.label}>{label}</Text>
@@ -756,8 +653,12 @@ const EventRegistrationScreen = () => {
     </View>
   );
 
+  // ─── RENDER PRINCIPAL ──────────────────────────────────────────
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 30 }}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Cadastro de Evento</Text>
         <Text style={styles.subtitle}>* Campos obrigatórios</Text>
@@ -766,9 +667,7 @@ const EventRegistrationScreen = () => {
       {uploading && (
         <View style={styles.uploadOverlay}>
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.uploadText}>
-            Enviando imagens... {uploadProgress}%
-          </Text>
+          <Text style={styles.uploadText}>Enviando... {uploadProgress}%</Text>
         </View>
       )}
 
@@ -793,8 +692,12 @@ const EventRegistrationScreen = () => {
 
         {/* Categoria */}
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Categoria</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <Text style={styles.label}>Categoria *</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryScroll}
+          >
             {categories.map(cat => (
               <TouchableOpacity
                 key={cat.id}
@@ -805,6 +708,7 @@ const EventRegistrationScreen = () => {
                 ]}
                 onPress={() => setSelectedCategoryId(cat.id)}
                 activeOpacity={0.7}
+                disabled={uploading}
               >
                 <Text
                   style={[
@@ -909,22 +813,27 @@ const EventRegistrationScreen = () => {
         </View>
       </View>
 
-      <View style={styles.locationContainer}>
+      {/* Localização */}
+      <View style={[styles.section, uploading && styles.disabledSection]}>
         <Text style={styles.sectionTitle}>Localização do Evento</Text>
 
-        <View style={styles.inputWrapper}>
-          <Text style={styles.label}>Pesquisar Local:</Text>
-
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Pesquisar Local *</Text>
           <TextInput
             style={styles.input}
-            placeholder="Pesquisar local"
+            placeholder="Digite endereço, cidade, bairro..."
             placeholderTextColor="#CCC"
             value={placeQuery}
             onChangeText={handleSearchPlace}
+            editable={!uploading}
           />
 
           {searchResults.length > 0 && (
-            <ScrollView style={styles.dropdown} nestedScrollEnabled={true}>
+            <ScrollView
+              style={styles.dropdown}
+              nestedScrollEnabled={true}
+              keyboardShouldPersistTaps="handled"
+            >
               {searchResults.map((place, index) => (
                 <TouchableOpacity
                   key={index}
@@ -944,7 +853,7 @@ const EventRegistrationScreen = () => {
                       longitude: lon,
                     });
 
-                    setSearchResults([]); // fecha dropdown
+                    setSearchResults([]);
                   }}
                 >
                   <Text style={styles.dropdownText}>{place.display_name}</Text>
@@ -952,34 +861,35 @@ const EventRegistrationScreen = () => {
               ))}
             </ScrollView>
           )}
-          {latitude && longitude && (
-            <View style={styles.mapContainer}>
-              <Text style={styles.mapHint}>Localização do Evento</Text>
-
-              <MapLibreGL.MapView
-                style={styles.map}
-                styleURL="https://demotiles.maplibre.org/style.json"
-                onPress={openInGoogleMaps} // ✅ clique no mapa
-              >
-                <MapLibreGL.Camera
-                  zoomLevel={15}
-                  centerCoordinate={[longitude, latitude]}
-                  animationMode="flyTo"
-                  animationDuration={500}
-                />
-
-                <MapLibreGL.PointAnnotation
-                  id="eventLocation"
-                  coordinate={[longitude, latitude]}
-                />
-              </MapLibreGL.MapView>
-
-              <Text style={styles.mapOpenHint}>
-                Toque no mapa para abrir no Google Maps
-              </Text>
-            </View>
-          )}
         </View>
+
+        {latitude && longitude && (
+          <View style={styles.mapContainer}>
+            <Text style={styles.mapHint}>Localização selecionada</Text>
+
+            <MapLibreGL.MapView
+              style={styles.map}
+              styleURL="https://demotiles.maplibre.org/style.json"
+              onPress={openInGoogleMaps}
+            >
+              <MapLibreGL.Camera
+                zoomLevel={15}
+                centerCoordinate={[longitude, latitude]}
+                animationMode="flyTo"
+                animationDuration={500}
+              />
+
+              <MapLibreGL.PointAnnotation
+                id="eventLocation"
+                coordinate={[longitude, latitude]}
+              />
+            </MapLibreGL.MapView>
+
+            <Text style={styles.mapOpenHint}>
+              Toque no mapa para abrir no Google Maps
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Configurações do Evento */}
@@ -988,21 +898,56 @@ const EventRegistrationScreen = () => {
 
         {renderSwitch('Evento Público', eventData.isPublic, 'isPublic')}
         {renderSwitch('Evento em Destaque', eventData.isFeatured, 'isFeatured')}
-        {renderSwitch('Evento Gratuito', eventData.isFree, 'isFree')}
+
+        {/* Switch de Evento Gratuito */}
+        <View style={styles.switchContainer}>
+          <Text style={styles.label}>Evento Gratuito</Text>
+          <Switch
+            value={eventData.isFree}
+            onValueChange={val => {
+              setEventData({ ...eventData, isFree: val });
+            }}
+            trackColor={{ false: '#767577', true: '#81b0ff' }}
+            thumbColor={eventData.isFree ? '#007AFF' : '#f4f3f4'}
+            disabled={uploading}
+          />
+        </View>
+
+        {/* Informação sobre bilhetes */}
+        <View style={styles.ticketInfo}>
+          <Text style={styles.ticketInfoTitle}>
+            {eventData.isFree ? '🎫 Evento Gratuito' : '💰 Evento Pago'}
+          </Text>
+          <Text style={styles.ticketInfoText}>
+            {eventData.isFree
+              ? 'Este evento não requer venda de bilhetes.'
+              : 'Após criar o evento, você poderá configurar as categorias de bilhetes.'}
+          </Text>
+        </View>
       </View>
 
-      {/* Botão de Envio */}
-      <TouchableOpacity
-        style={[styles.submitButton, uploading && styles.disabledButton]}
-        onPress={handleSubmit}
-        disabled={uploading}
-      >
-        {uploading ? (
-          <ActivityIndicator color="#FFFFFF" />
-        ) : (
-          <Text style={styles.submitButtonText}>Cadastrar Evento</Text>
-        )}
-      </TouchableOpacity>
+      {/* Botões de Ação */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={[styles.cancelButton, uploading && styles.disabledButton]}
+          onPress={resetForm}
+          disabled={uploading}
+        >
+          <Text style={styles.cancelButtonText}>Limpar Formulário</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.submitButton, uploading && styles.disabledButton]}
+          onPress={handleSubmit}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.submitButtonText}>Cadastrar Evento</Text>
+          )}
+        </TouchableOpacity>
+      </View>
 
       {/* Date Pickers */}
       {showDatePicker && (
@@ -1011,6 +956,7 @@ const EventRegistrationScreen = () => {
           mode="date"
           display="default"
           onChange={handleDateChange}
+          minimumDate={new Date()}
         />
       )}
 
@@ -1038,6 +984,7 @@ const EventRegistrationScreen = () => {
           mode="date"
           display="default"
           onChange={handleDateChange}
+          minimumDate={new Date()}
         />
       )}
     </ScrollView>

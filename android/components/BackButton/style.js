@@ -5,12 +5,12 @@ import getFontFamily from '../../../assets/helper';
 const style = StyleSheet.create({
   container: {
     backgroundColor: '#FAFAFA',
-    width: horizontalScale(44),
-    height: horizontalScale(44),
+    width: horizontalScale(20),
+    height: horizontalScale(20),
     borderRadius: horizontalScale(22),
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 40,
+    marginTop: 15,
   },
   icon: {
     // fontFamily: getFontFamily(3, 600),

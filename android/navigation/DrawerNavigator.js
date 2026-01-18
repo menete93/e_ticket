@@ -8,6 +8,7 @@ import CategoryRegistry from './../screens/CategoriesRegistry/CategoryRegistry';
 import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import CustomDrawerContent from './../components/CustomDrawerContent/CustomDrawerContent';
 import EventRegistrationScreen from './../screens/EventRegistry/EventRegistry';
+import PricingStrategyScreen from './../screens/PricingStrategy/PricingStrategyScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -36,7 +37,7 @@ export default function DrawerNavigator() {
 
       <Drawer.Screen
         name="Configurações"
-        component={SettingsScreen}
+        component={PricingStrategyScreen}
         options={{
           // eslint-disable-next-line react/no-unstable-nested-components
           drawerIcon: ({ color, size }) => (

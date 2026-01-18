@@ -8,7 +8,7 @@ import style from './style';
 const BackButton = ({ onPress }) => {
   return (
     <Pressable onPress={onPress} style={style.container}>
-      <Icon name="arrow-left" size={scaleFontSize(22)} style={style.icon} />
+      <Icon name="arrow-left" size={scaleFontSize(15)} style={style.icon} />
     </Pressable>
   );
 };

@@ -47,6 +47,7 @@ const style = StyleSheet.create({
     paddingVertical: 8,
   },
   categoryScroll: {
+    maxHeight: 50,
     flexDirection: 'row',
   },
 
@@ -304,6 +305,127 @@ const style = StyleSheet.create({
     color: '#FFF',
     fontWeight: '700',
     fontSize: 16,
+  },
+
+  // Adicione estas styles ao seu arquivo style.js existente
+
+  stepIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#f0f8ff',
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  step: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  stepActive: {
+    backgroundColor: '#007AFF',
+  },
+  stepText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  stepLabel: {
+    color: '#007AFF',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+
+  ticketConfigSection: {
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  ticketSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+  },
+  ticketConfigButton: {
+    backgroundColor: '#f0f8ff',
+    borderWidth: 2,
+    borderColor: '#007AFF',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+  },
+  ticketConfigButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  ticketConfigCount: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  ticketPreview: {
+    marginTop: 15,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 12,
+  },
+  ticketPreviewTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 8,
+  },
+  ticketPreviewItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  ticketPreviewName: {
+    fontSize: 14,
+    color: '#333',
+  },
+  ticketPreviewPrice: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  ticketPreviewMore: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    paddingHorizontal: 10,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    padding: 15,
+    borderRadius: 10,
+    marginRight: 10,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
