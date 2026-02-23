@@ -17,20 +17,44 @@ import {
   ActivityIndicator,
   Linking,
 } from 'react-native';
+
 import DateTimePicker from '@react-native-community/datetimepicker';
 import getCategories from './../../services/categoryService';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import styles from './style';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 MapLibreGL.setAccessToken(null);
 
 const EventRegistrationScreen = ({ navigation, route }) => {
   // Estados principais
-  const [createdEventId, setCreatedEventId] = useState(null); // Novo: ID do evento criado
+  const [createdEventId, setCreatedEventId] = useState(null);
   const [ticketConfig, setTicketConfig] = useState([]);
+  const [user, setUser] = useState(null); // Mantém apenas este
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          console.log('Usuário          para registrar:', parsedUser);
+        }
+      } catch (error) {
+        console.error('Erro ao pegar usuário:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   // Estados para os campos do evento
   const [eventData, setEventData] = useState({
+    userId: '',
     name: '',
     description: '',
     latitude: null,
@@ -408,6 +432,7 @@ const EventRegistrationScreen = ({ navigation, route }) => {
 
       // Preparar payload do evento
       const payload = {
+        userId: user?.id, // 👈 aqui
         name: eventData.name.trim(),
         description: eventData.description.trim(),
         geographicLocation: {
@@ -484,7 +509,9 @@ const EventRegistrationScreen = ({ navigation, route }) => {
       console.error('💥 Erro:', error);
       Alert.alert(
         'Erro',
-        `Falha ao criar evento: ${error.message || 'Erro desconhecido'}`,
+        `Falha ao criar evento: ${
+          error.message.message || 'Erro desconhecido'
+        }`,
         [{ text: 'OK' }],
       );
     } finally {

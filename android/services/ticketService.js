@@ -1,6 +1,6 @@
 import { api } from './../services/api';
 
-export const getTickets = () => api.get('/ticket');
+export const getTickets = eventId => api.get(`/ticket/${eventId}`);
 
 export const getTicketById = id => api.get(`/ticket/${id}`);
 
