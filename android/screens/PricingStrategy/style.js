@@ -1,347 +1,459 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
-  // Container principal
-  container: {
-    flexGrow: 1,
-    backgroundColor: '#F9FAFB',
-    padding: 20,
-  },
-
-  // Header
-  header: {
-    alignItems: 'center',
-    marginBottom: 30,
-    paddingTop: 10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginTop: 12,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 4,
-    textAlign: 'center',
-  },
-
-  // Badge de modo edição
-  editModeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#4F46E5',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginTop: 8,
-  },
-  editModeText: {
-    fontSize: 12,
-    color: '#FFFFFF',
-    fontWeight: '500',
-    marginLeft: 4,
-  },
-
-  // Seções
-  section: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 16,
-  },
-
-  // Inputs
-  inputContainer: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  labelIcon: {
-    marginRight: 6,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  input: {
+  safeArea: {
     flex: 1,
-    height: 48,
     backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    fontSize: 16,
-    color: '#1F2937',
-  },
-  inputWithPrefix: {
-    paddingLeft: 40,
-  },
-  inputWithSuffix: {
-    paddingRight: 40,
-  },
-  inputDisabled: {
-    backgroundColor: '#F3F4F6',
-    color: '#9CA3AF',
-  },
-  currencySymbol: {
-    position: 'absolute',
-    left: 12,
-    fontSize: 16,
-    color: '#6B7280',
-    zIndex: 1,
-  },
-  percentageSymbol: {
-    position: 'absolute',
-    right: 12,
-    fontSize: 16,
-    color: '#6B7280',
-    zIndex: 1,
-  },
-
-  // Picker
-  pickerContainer: {
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  picker: {
-    height: 48,
-    color: '#1F2937',
   },
 
   // Loading
   loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center',
+  },
+  loadingGradient: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginLeft: 8,
+    marginTop: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '500',
   },
 
-  // Botões de tipo de estratégia
-  strategyTypeContainer: {
-    flexDirection: 'row',
-    gap: 12,
+  // Header
+  headerGradient: {
+    paddingTop: 20,
+    paddingBottom: 30,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
-  strategyTypeButton: {
-    flex: 1,
+  headerContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
+    marginBottom: 8,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginLeft: 8,
+  },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.9,
+  },
+  resetButton: {
+    position: 'absolute',
+    top: 0,
+    right: 20,
+    padding: 8,
+  },
+
+  // Container
+  container: {
     paddingHorizontal: 16,
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    gap: 8,
-  },
-  strategyTypeButtonActive: {
-    backgroundColor: '#EEF2FF',
-    borderColor: '#4F46E5',
-  },
-  strategyTypeText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
-  },
-  strategyTypeTextActive: {
-    color: '#4F46E5',
+    paddingTop: 20,
+    paddingBottom: 40,
   },
 
-  // Grid de preços
-  priceGrid: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+  // Steps
+  stepsWrapper: {
+    marginBottom: 24,
   },
-  priceColumn: {
-    flex: 1,
-  },
-  priceInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#F0F9FF',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  priceInfoText: {
-    fontSize: 12,
-    color: '#0369A1',
-    marginLeft: 8,
-    flex: 1,
-  },
-
-  // Grid dinâmico
-  dynamicGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  dynamicColumn: {
-    flex: 1,
-  },
-  helperText: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
-  },
-
-  // Escopo de aplicação
-  scopeContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  scopeOption: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-  },
-  scopeOptionActive: {
-    backgroundColor: '#EEF2FF',
-    borderColor: '#4F46E5',
-  },
-  scopeOptionText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  scopeOptionTextActive: {
-    color: '#4F46E5',
-  },
-  scopeOptionSubtext: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 4,
-    textAlign: 'center',
-  },
-
-  // Switch
-  switchContainer: {
+  stepsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  switchLabel: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  stepItem: {
+    alignItems: 'center',
     flex: 1,
   },
-  switchTextContainer: {
+  stepCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  stepCircleActive: {
+    backgroundColor: '#6366F1',
+  },
+  stepLabel: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+  },
+  stepLabelActive: {
+    color: '#6366F1',
+    fontWeight: '600',
+  },
+  stepLine: {
+    height: 2,
+    flex: 1,
+    backgroundColor: '#E5E7EB',
+    marginHorizontal: 8,
+  },
+  stepLineActive: {
+    backgroundColor: '#6366F1',
+  },
+
+  // Cards
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  eventCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  categoriesCard: {
+    // Estilo específico
+  },
+  strategiesCard: {
+    // Estilo específico
+  },
+  cardIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EEF2FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  cardContent: {
+    flex: 1,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  cardHeaderText: {
     flex: 1,
     marginLeft: 12,
   },
-  switchText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-  },
-  switchSubtext: {
+  cardLabel: {
     fontSize: 12,
     color: '#6B7280',
-    marginTop: 2,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  cardPlaceholder: {
+    fontSize: 16,
+    color: '#9CA3AF',
+    marginBottom: 4,
+  },
+  cardHint: {
+    fontSize: 12,
+    color: '#6366F1',
+  },
+  cardDescription: {
+    fontSize: 13,
+    color: '#6B7280',
   },
 
-  // Botões
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 24,
-    marginBottom: 40,
-    gap: 12,
+  // Select All Button
+  selectAllButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#EEF2FF',
+    borderRadius: 16,
   },
-  cancelButton: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-  },
-  cancelButtonText: {
-    fontSize: 16,
+  selectAllText: {
+    fontSize: 12,
+    color: '#6366F1',
     fontWeight: '500',
-    color: '#374151',
-  },
-  submitButton: {
-    flex: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    backgroundColor: '#4F46E5',
-    borderRadius: 8,
-    gap: 8,
-  },
-  submitButtonDisabled: {
-    backgroundColor: '#9CA3AF',
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 14,
-    backgroundColor: '#EF4444',
-    borderRadius: 8,
-    gap: 8,
-    flex: 1,
-  },
-  deleteButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
 
-  // Loading full screen
-  loadingFullScreen: {
-    flex: 1,
+  // Categories
+  categoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -4,
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    margin: 4,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  categoryChipSelected: {
+    backgroundColor: '#EEF2FF',
+    borderColor: '#6366F1',
+  },
+  categoryChipText: {
+    fontSize: 14,
+    color: '#4B5563',
+    marginLeft: 6,
+    marginRight: 4,
+  },
+  categoryChipTextSelected: {
+    color: '#6366F1',
+    fontWeight: '500',
+  },
+  categoryChipBadge: {
+    backgroundColor: '#6366F1',
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 4,
+  },
+  categoryChipBadgeText: {
+    fontSize: 10,
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+
+  // Selected Count Badge
+  selectedCountBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  selectedCountText: {
+    fontSize: 14,
+    color: '#10B981',
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+
+  // Loading Tickets
+  loadingTickets: {
+    padding: 20,
+  },
+
+  // Empty State
+  emptyState: {
+    alignItems: 'center',
+    padding: 24,
+  },
+  emptyStateText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    marginTop: 8,
+  },
+
+  // Add Button
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  addButtonText: {
+    fontSize: 12,
+    color: '#6366F1',
+    fontWeight: '500',
+    marginLeft: 4,
+  },
+
+  // Conflict Warning
+  conflictWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  conflictWarningText: {
+    fontSize: 14,
+    color: '#EF4444',
+    fontWeight: '500',
+    marginLeft: 8,
+  },
+
+  // Strategies List
+  strategiesList: {
+    marginTop: 8,
+  },
+  strategyCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  strategyGradient: {
+    padding: 16,
+  },
+  strategyHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  strategyIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  strategyInfo: {
+    flex: 1,
+  },
+  strategyName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 2,
+  },
+  strategySubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  strategyAction: {
+    padding: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+  },
+  associatedCatsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+  },
+  associatedCatTag: {
+    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+  },
+  associatedCatText: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginRight: 4,
+  },
+  noAssociationText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
 
-  // Modal de seleção de estratégias
+  // Empty Strategies
+  emptyStrategies: {
+    alignItems: 'center',
+    padding: 32,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  emptyStrategiesText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    marginTop: 8,
+  },
+
+  // Apply Button
+  applyButton: {
+    borderRadius: 30,
+    overflow: 'hidden',
+    marginTop: 8,
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  applyGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  applyButtonDisabled: {
+    opacity: 0.7,
+  },
+  applyButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 8,
+    marginRight: 12,
+  },
+  applyBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+  },
+  applyBadgeText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+
+  // Modals
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -349,14 +461,17 @@ export default StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '80%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    maxHeight: height * 0.8,
+  },
+  strategyModalContainer: {
+    maxHeight: height * 0.9,
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
@@ -369,449 +484,423 @@ export default StyleSheet.create({
   modalCloseButton: {
     padding: 4,
   },
-  modalLoading: {
-    padding: 40,
-    alignItems: 'center',
+  modalList: {
+    padding: 16,
   },
-  modalLoadingText: {
-    marginTop: 12,
+  modalFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    backgroundColor: '#F9FAFB',
+  },
+  modalFooterText: {
     fontSize: 14,
     color: '#6B7280',
   },
-  modalEmpty: {
-    padding: 40,
-    alignItems: 'center',
-  },
-  modalEmptyText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  modalEmptyButton: {
-    marginTop: 20,
+  modalConfirmButton: {
+    backgroundColor: '#6366F1',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: '#4F46E5',
-    borderRadius: 8,
+    borderRadius: 20,
   },
-  modalEmptyButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '500',
-  },
-  modalList: {
-    padding: 20,
-  },
-  modalListHeader: {
-    marginBottom: 16,
-  },
-  modalListCount: {
+  modalConfirmButtonText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 
-  // Item da lista de estratégias
-  strategyItem: {
+  // Event Modal Items
+  eventModalItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    padding: 16,
     backgroundColor: '#F9FAFB',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    marginBottom: 8,
   },
-  strategyItemSelected: {
-    backgroundColor: '#E0E7FF',
-    borderColor: '#4F46E5',
+  eventModalItemSelected: {
+    backgroundColor: '#EEF2FF',
+    borderWidth: 2,
+    borderColor: '#6366F1',
   },
-  strategyItemContent: {
-    flex: 1,
+  eventModalIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
   },
-  strategyItemHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  eventModalInfo: {
+    flex: 1,
+  },
+  eventModalName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
     marginBottom: 4,
   },
-  strategyItemName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1F2937',
-    flex: 1,
-    marginRight: 8,
-  },
-
-  strategyTypeFixed: {
-    backgroundColor: '#E0E7FF',
-  },
-  strategyTypeBadgeText: {
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  strategyItemEvent: {
+  eventModalDate: {
     fontSize: 14,
     color: '#6B7280',
-    marginBottom: 4,
-  },
-  strategyItemDetails: {
-    flexDirection: 'row',
-  },
-  strategyItemPrice: {
-    fontSize: 13,
-    color: '#4B5563',
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
   },
 
-  // Estratégia selecionada
-  selectedStrategyContainer: {
+  // Strategy Modal Items
+  strategyModalItem: {
+    marginBottom: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  strategyModalItemSelected: {
+    shadowColor: '#6366F1',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  strategyModalGradient: {
+    padding: 16,
+    flexDirection: 'row',
+  },
+  strategyModalIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  strategyModalContent: {
+    flex: 1,
+  },
+  strategyModalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#F0F9FF',
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: '#0EA5E9',
-    marginBottom: 12,
+    marginBottom: 4,
   },
-  selectedStrategyInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  selectedStrategyHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  selectedStrategyName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#0C4A6E',
-    flex: 1,
-    marginRight: 8,
-  },
-  selectedStrategyTypeBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-  },
-  selectedStrategyTypeText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#0C4A6E',
-  },
-  selectedStrategyDetails: {
-    fontSize: 14,
-    color: '#0369A1',
-    marginBottom: 2,
-  },
-  clearSelectionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-  },
-  clearSelectionText: {
-    fontSize: 14,
-    color: '#EF4444',
-    marginLeft: 4,
-    fontWeight: '500',
-  },
-
-  // Botão para selecionar estratégia
-  selectStrategyButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderStyle: 'dashed',
-    marginBottom: 12,
-  },
-  selectStrategyButtonTextContainer: {
-    flex: 1,
-    marginLeft: 16,
-    marginRight: 16,
-  },
-  selectStrategyButtonTitle: {
+  strategyModalName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
+    flex: 1,
+  },
+  strategyModalSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
     marginBottom: 4,
   },
-  selectStrategyButtonSubtitle: {
-    fontSize: 14,
+  strategyModalDescription: {
+    fontSize: 13,
     color: '#6B7280',
+    marginBottom: 8,
   },
-
-  // Botão para nova estratégia
-  newStrategyButton: {
+  strategyModalFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#10B981',
-    borderRadius: 12,
-    padding: 16,
+    justifyContent: 'space-between',
   },
-  newStrategyButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginLeft: 8,
+  strategyTypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  strategyTypeText: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginLeft: 4,
+  },
+  strategyInfoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  strategyInfoText: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginLeft: 4,
   },
 
-  // Modal de confirmação de exclusão
-  deleteModalOverlay: {
+  // Association Modal
+  associationSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  associationList: {
+    padding: 16,
+  },
+  associationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  associationItemSelected: {
+    backgroundColor: '#EEF2FF',
+  },
+  associationItemText: {
+    fontSize: 16,
+    color: '#1F2937',
+    marginLeft: 12,
+  },
+  associationItemTextSelected: {
+    color: '#6366F1',
+    fontWeight: '500',
+  },
+
+  // Details Modal
+  detailsModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
-  deleteModalContainer: {
+  detailsModalContainer: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
-    width: '100%',
-    maxWidth: 400,
+    borderRadius: 30,
+    width: width * 0.9,
+    maxHeight: height * 0.8,
+    overflow: 'hidden',
   },
-  deleteModalIcon: {
+  detailsModalHeader: {
+    padding: 30,
+    alignItems: 'center',
+  },
+  detailsModalIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
-  deleteModalTitle: {
-    fontSize: 20,
+  detailsModalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  detailsModalSubtitle: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  detailsModalClose: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    padding: 4,
+  },
+  detailsModalContent: {
+    padding: 20,
+  },
+  detailsSection: {
+    marginBottom: 20,
+  },
+  detailsSectionTitle: {
+    fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
-    textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  deleteModalText: {
+  detailsText: {
     fontSize: 14,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginBottom: 24,
+    color: '#4B5563',
     lineHeight: 20,
   },
-  deleteModalButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  deleteModalCancelButton: {
-    flex: 1,
+  detailsModalButton: {
+    backgroundColor: '#6366F1',
+    padding: 16,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
   },
-  deleteModalCancelText: {
+  detailsModalButtonText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
-  deleteModalConfirmButton: {
+
+  // Results Modal
+  resultItem: {
+    flexDirection: 'row',
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  resultSuccess: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#10B981',
+  },
+  resultError: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#EF4444',
+  },
+  resultIconContainer: {
+    marginRight: 12,
+  },
+  resultContent: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    backgroundColor: '#EF4444',
-    borderRadius: 8,
   },
-  deleteModalConfirmText: {
+  resultStrategyName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  // resultMessage: {
+  //   fontSize: 14,
+  //   color: '#4B5563',
+  //   marginBottom: 8,
+  // },
+  resultStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  resultStatsText: {
+    fontSize: 12,
+    color: '#6366F1',
+    marginLeft: 4,
+  },
+
+  // style.js (adicione estes estilos)
+
+  resultsSummary: {
+    marginBottom: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+
+  summaryGradient: {
+    padding: 20,
+    alignItems: 'center',
+  },
+
+  summaryTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 8,
+  },
+
+  summarySubtitle: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    marginTop: 4,
+  },
+
+  resultCard: {
+    marginBottom: 12,
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+
+  resultGradient: {
+    padding: 16,
+  },
+
+  resultHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  resultIconBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+
+  resultHeaderInfo: {
+    flex: 1,
+  },
+
+  resultName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
-  },
-
-  // Refresh button
-  refreshButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    alignSelf: 'flex-start',
-  },
-  refreshButtonText: {
-    fontSize: 14,
-    color: '#4F46E5',
-    marginLeft: 4,
-  },
-
-  // Empty states
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    marginBottom: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginTop: 12,
-    textAlign: 'center',
-  },
-
-  // New strategy section
-  newStrategySection: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
-    marginTop: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-
-  // Strategies list
-  strategiesList: {
-    marginBottom: 30,
-  },
-
-  strategyCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-
-  strategyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-
-  strategyName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    flex: 1,
-  },
-
-  strategyTypeBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    marginLeft: 8,
-  },
-
-  // strategyTypeBadge: {
-  //   paddingHorizontal: 8,
-  //   paddingVertical: 2,
-  //   borderRadius: 12,
-  // },
-
-  strategyTypeDynamic: {
-    backgroundColor: '#FEF3C7',
-  },
-  strategyInfo: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 12,
-  },
-
-  strategyDetails: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 12,
-  },
-
-  strategyDetail: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 16,
     marginBottom: 4,
   },
 
-  strategyDetailText: {
-    fontSize: 13,
-    color: '#4B5563',
+  resultMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  resultCategoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+
+  resultCategory: {
+    fontSize: 12,
+    color: '#FFFFFF',
     marginLeft: 4,
   },
 
-  dynamicInfo: {
-    backgroundColor: '#F9FAFB',
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 12,
-  },
-
-  dynamicText: {
-    fontSize: 13,
-    color: '#374151',
-    fontStyle: 'italic',
-  },
-
-  strategyActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+  resultBody: {
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: 'rgba(255,255,255,0.2)',
     paddingTop: 12,
   },
 
-  actionButton: {
+  resultMessage: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+
+  resultDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  resultDetailItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginLeft: 8,
-    backgroundColor: '#F3F4F6',
   },
 
-  deleteButtonStyle: {
-    backgroundColor: '#FEF2F2',
-  },
-
-  actionButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#4F46E5',
+  resultDetailText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    opacity: 0.8,
     marginLeft: 4,
   },
 
-  deleteButtonTextStyle: {
-    color: '#EF4444',
-  },
-  // No seu arquivo style
-  pickerLoading: {
-    position: 'absolute',
-    right: 40,
-    top: 12,
-    backgroundColor: 'transparent',
-    zIndex: 1,
+  resultsList: {
+    paddingBottom: 16,
   },
 
-  selectedTicketInfo: {
-    flexDirection: 'row',
+  confirmGradient: {
+    paddingVertical: 14,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: '#EEF2FF',
-    borderRadius: 6,
-    gap: 8,
-  },
-
-  selectedTicketText: {
-    fontSize: 12,
-    color: '#4F46E5',
-    flex: 1,
   },
 });

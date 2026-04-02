@@ -9,6 +9,7 @@ import HomeScreen from '../screens/HomeScreen/HomeScreen';
 import CustomDrawerContent from './../components/CustomDrawerContent/CustomDrawerContent';
 import EventRegistrationScreen from './../screens/EventRegistry/EventRegistry';
 import PricingStrategyScreen from './../screens/PricingStrategy/PricingStrategyScreen';
+import BottomTabs from './BottomTabs';
 
 const Drawer = createDrawerNavigator();
 
@@ -65,6 +66,12 @@ export default function DrawerNavigator() {
             <Ionicons name="add-circle-outline" color={color} size={size} />
           ),
         }}
+      />
+
+      <Drawer.Screen
+        name="MainTabs"
+        component={BottomTabs}
+        options={{ title: 'Início' }}
       />
     </Drawer.Navigator>
   );
