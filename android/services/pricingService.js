@@ -68,11 +68,11 @@ export const applyStrategyToEvent = async payload => {
 //   return response.data;
 // },
 
-// // Buscar estratégia por ID
-// getStrategy: async (id) => {
-//   const response = await api.get(`/strategies/${id}`);
-//   return response.data;
-// },
+// Buscar estratégia por ID DO EVENTO
+export const getEventStrategies = async eventId => {
+  const response = await api.get(`/api/pricing/strategies/event/${eventId}`);
+  return response.data;
+};
 
 // // Atualizar estratégia
 // updateStrategy: async (id, data) => {

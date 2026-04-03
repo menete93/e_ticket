@@ -32,3 +32,21 @@ export default async function getCategories() {
   const response = await api.get('/event-categories');
   return response.data; // deve retornar um array de objetos [{ id, name }, ...]
 }
+
+// Buscar categoria por ID
+export const getEventCategoryById = async id => {
+  const response = await api.get(`/event-categories/${id}`);
+  return response.data;
+};
+
+// Buscar categoria por nome
+export const getEventCategoryByName = async name => {
+  const response = await api.get(`/event-categories/name/${name}`);
+  return response.data;
+};
+
+// Buscar categorias populares
+export const getPopularCategories = async () => {
+  const response = await api.get('/event-categories/popular');
+  return response.data;
+};

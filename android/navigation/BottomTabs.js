@@ -8,6 +8,8 @@ import TicketsScreen from '../screens/TicketSale/TicketSelectionScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import PriceBreakdown from './../screens/PriceBreakdown/PriceBreakdown';
 import CreateCouponScreen from './../screens/Coupon/CreateCouponScreen';
+import { CheckoutFlow } from './../screens/CheckoutFlow/CheckoutFlow';
+import TicketSelectionScreen from '../screens/TicketSale/TicketSelectionScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -34,6 +36,10 @@ export default function BottomTabs() {
             iconName = 'cash';
           } else if (route.name === 'cupon') {
             iconName = 'ticket-percent';
+          } else if (route.name === 'buy') {
+            iconName = 'fa-cart-shopping';
+          } else if (route.name === 'events') {
+            iconName = 'fa-cart-shopping';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
@@ -41,11 +47,12 @@ export default function BottomTabs() {
       })}
     >
       <Tab.Screen name="cupon" component={CreateCouponScreen} />
-      <Tab.Screen name="price" component={PriceBreakdown} />
+      <Tab.Screen name="events" component={TicketSelectionScreen} />
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Eventos" component={EventsScreen} />
       <Tab.Screen name="Tickets" component={TicketsScreen} />
-      <Tab.Screen name="Perfil" component={ProfileScreen} />
+      <Tab.Screen name="buy" component={CheckoutFlow} />
+      {/* <Tab.Screen name="Perfil" component={ProfileScreen} /> */}
     </Tab.Navigator>
   );
 }

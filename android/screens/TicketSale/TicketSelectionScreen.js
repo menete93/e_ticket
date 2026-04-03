@@ -12,8 +12,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ticketService } from '../../services/ticketService';
-import { pricingService } from '../../services/pricingService';
+import { getEventStrategies } from '../../services/pricingService';
+import { getTickets } from '../../services/pricingService';
 import PriceBreakdown from './../PriceBreakdown/PriceBreakdown';
 import styles from './style';
 
@@ -62,7 +62,7 @@ export default function TicketSelectionScreen({ route, navigation }) {
     try {
       setLoading(true);
 
-      const ticketsResponse = await ticketService.getEventTickets(event.id);
+      const ticketsResponse = await getTickets(event.id);
       setTickets(ticketsResponse);
 
       const initialQuantities = {};
@@ -72,9 +72,7 @@ export default function TicketSelectionScreen({ route, navigation }) {
 
       setQuantities(initialQuantities);
 
-      const strategiesResponse = await pricingService.getEventStrategies(
-        event.id,
-      );
+      const strategiesResponse = await getEventStrategies(event.id);
       setEventStrategies(strategiesResponse);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os ingressos');
@@ -103,7 +101,7 @@ export default function TicketSelectionScreen({ route, navigation }) {
       };
 
       console.log('📦 Payload cálculo:', payload);
-      const response = await ticketService.calculatePrice(payload);
+      const response = await calculatePrice(payload);
       setPriceCalculation(response);
     } catch (error) {
       console.error('Erro ao calcular preço:', error);

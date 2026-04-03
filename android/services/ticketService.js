@@ -1,5 +1,7 @@
-import { api } from './../services/api';
+// services/ticket.service.js
+import { api } from './api';
 
+// ==================== TICKETS ====================
 export const getTickets = eventId => api.get(`/ticket/${eventId}`);
 
 export const getTicketById = id => api.get(`/ticket/${id}`);
@@ -18,39 +20,79 @@ export const createTicketsForEvent = async ticketData => {
   }
 };
 
-// 🔹 Atualiza ticket existente
 export const updateTicket = (id, data) => api.put(`/ticket/${id}`, data);
 
-// 🔹 Deleta ticket
 export const deleteTicket = id => api.delete(`/ticket/${id}`);
 
-// Calcular preço com estratégias
+// ==================== CHECKOUT & SALES ====================
 export const calculatePrice = async data => {
-  const response = await api.post('/tickets/calculate-price', data);
+  const response = await api.post('/api/v1/tickets/calculate-price', data);
   return response.data;
 };
 
-// Finalizar compra
 export const checkout = async data => {
-  const response = await api.post('/tickets/checkout', data);
+  const response = await api.post('/api/v1/tickets/checkout', data);
   return response.data;
 };
 
-// Buscar venda por transação
 export const getSaleByTransaction = async transactionId => {
-  const response = await api.get(`/tickets/sale/${transactionId}`);
+  const response = await api.get(`/api/v1/tickets/sale/${transactionId}`);
   return response.data;
 };
 
-// Buscar vendas do usuário
 export const getUserSales = async userId => {
-  const response = await api.get(`/tickets/user/${userId}/sales`);
+  const response = await api.get(`/api/v1/tickets/user/${userId}/sales`);
   return response.data;
 };
 
-// Calcular preço com cupom
-// export const calculateWithCoupon = async (ticketId, quantity, couponCode) => {
-//   const response = await api.get('/tickets/calculate-with-coupon', {
-//     params: { ticketId, quantity, couponCode }
-//   });
-//   return response.data;
+export const processPayment = async (
+  transactionId,
+  paymentMethod,
+  paymentReference,
+) => {
+  const response = await api.post(
+    `/api/v1/tickets/sale/${transactionId}/process-payment`,
+    null,
+    {
+      params: { paymentMethod, paymentReference },
+    },
+  );
+  return response.data;
+};
+
+export const cancelSale = async (transactionId, reason) => {
+  const response = await api.post(
+    `/api/v1/tickets/sale/${transactionId}/cancel`,
+    null,
+    {
+      params: { reason },
+    },
+  );
+  return response.data;
+};
+
+export const calculateWithCoupon = async (ticketId, quantity, couponCode) => {
+  const response = await api.get('/api/v1/tickets/calculate-with-coupon', {
+    params: { ticketId, quantity, couponCode },
+  });
+  return response.data;
+};
+
+// ==================== M-PESA PAYMENT ====================
+export const mpesaStkPush = async paymentData => {
+  // Ajustado conforme os parâmetros do seu backend M-Pesa
+  const response = await api.post('/payments/mpesa/stkpush', {
+    transactionReference: paymentData.transactionReference,
+    customerMSISDN: paymentData.customerMSISDN,
+    amount: paymentData.amount,
+    entityCode: paymentData.entityCode || 'MOZBUY2024', // Código da entidade/empresa
+  });
+  return response.data;
+};
+
+export const checkMpesaPaymentStatus = async transactionReference => {
+  const response = await api.get(
+    `/payments/mpesa/status/${transactionReference}`,
+  );
+  return response.data;
+};
