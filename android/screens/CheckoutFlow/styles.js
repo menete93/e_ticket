@@ -1,125 +1,290 @@
+// components/checkout/styles.js
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7fafc',
+    backgroundColor: '#f8fafc',
   },
   header: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2d3748',
-    marginBottom: 16,
-  },
-  stepIndicator: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  step: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  stepActive: {
-    backgroundColor: '#667eea',
-  },
-  stepCompleted: {
-    backgroundColor: '#48bb78',
-  },
-  stepText: {
-    fontSize: 12,
-    color: '#4a5568',
-  },
-  stepTextActive: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-  },
-  leftColumn: {
-    flex: 1,
-  },
-  rightColumn: {
-    marginTop: 16,
-  },
-  buyerInfoSection: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    marginTop: 16,
-  },
-  sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2d3748',
-    marginBottom: 16,
+    color: '#fff',
   },
-  formGroup: {
-    marginBottom: 16,
+  eventSection: {
+    backgroundColor: '#fff',
+    margin: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  formLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#4a5568',
+  eventName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1f2937',
     marginBottom: 8,
   },
-  formInput: {
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    backgroundColor: '#fff',
-  },
-  helperText: {
-    fontSize: 12,
-    color: '#718096',
-    marginTop: 4,
-  },
-  actionButtons: {
-    padding: 16,
-  },
-  proceedButton: {
-    backgroundColor: '#667eea',
-    padding: 16,
-    borderRadius: 12,
+  eventBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
-  proceedButtonText: {
-    color: '#fff',
+  eventBadgeText: {
+    fontSize: 14,
+    color: '#4F46E5',
+    fontWeight: '500',
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+  },
+  progressStep: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  progressCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#e5e7eb',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  progressCircleActive: {
+    backgroundColor: '#4F46E5',
+  },
+  progressNumber: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  progressLabel: {
+    fontSize: 11,
+    color: '#9ca3af',
+  },
+  progressLabelActive: {
+    color: '#4F46E5',
+    fontWeight: '500',
+  },
+  progressLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 8,
+  },
+  section: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 16,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  sectionTitle: {
     fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  ticketCard: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    paddingVertical: 12,
+  },
+  ticketCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  ticketCardName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  ticketCardQuantity: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#4F46E5',
+  },
+  ticketCardDescription: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginBottom: 8,
+  },
+  ticketCardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  ticketCardPrice: {
+    fontSize: 13,
+    color: '#9ca3af',
+  },
+  ticketCardSubtotal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 15,
+    color: '#1f2937',
+    backgroundColor: '#f9fafb',
+  },
+  inputHelper: {
+    fontSize: 11,
+    color: '#9ca3af',
+    marginTop: 6,
+  },
+  summarySection: {
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  summaryValue: {
+    fontSize: 14,
+    color: '#1f2937',
+  },
+  discountLabel: {
+    fontSize: 14,
+    color: '#10B981',
+  },
+  discountValue: {
+    fontSize: 14,
+    color: '#10B981',
+  },
+  summaryDivider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 12,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+  },
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  totalValue: {
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#4F46E5',
+  },
+  fixedButton: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  checkoutButton: {
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  checkoutButtonDisabled: {
+    opacity: 0.6,
+  },
+  checkoutGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  checkoutButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  checkoutButtonPrice: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   errorToast: {
     position: 'absolute',
     bottom: 20,
     left: 20,
     right: 20,
-    backgroundColor: '#fc8181',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: '#fee2e2',
+    borderRadius: 12,
+    padding: 12,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 10,
   },
-  errorText: {
-    color: '#fff',
+  errorToastText: {
     flex: 1,
+    fontSize: 13,
+    color: '#dc2626',
   },
-  errorClose: {
-    color: '#fff',
-    fontWeight: 'bold',
-    marginLeft: 16,
+  errorToastClose: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#dc2626',
   },
 });

@@ -2,6 +2,10 @@
 import AppNavigator from "./android/navigation/AppNavigator";
 import firebase from '@react-native-firebase/app';
 import React, { useEffect } from 'react';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthProvider } from './android/contexts/authContext'
+
+
 
 
 
@@ -15,6 +19,9 @@ export default function App() {
   }, []);
 
 
-
-  return <AppNavigator />;
+  return (
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
+  );
 }

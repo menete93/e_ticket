@@ -26,8 +26,13 @@ export const deleteTicket = id => api.delete(`/ticket/${id}`);
 
 // ==================== CHECKOUT & SALES ====================
 export const calculatePrice = async data => {
-  const response = await api.post('/api/v1/tickets/calculate-price', data);
-  return response.data;
+  try {
+    const response = await api.post('/api/v1/tickets/calculate-price', data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao calcular preço:', error);
+    throw error;
+  }
 };
 
 export const checkout = async data => {
@@ -93,6 +98,34 @@ export const mpesaStkPush = async paymentData => {
 export const checkMpesaPaymentStatus = async transactionReference => {
   const response = await api.get(
     `/payments/mpesa/status/${transactionReference}`,
+  );
+  return response.data;
+};
+
+// services/ticketService.js
+
+export const batchUpdateTickets = async (
+  eventId,
+  updates,
+  globalChangeReason,
+) => {
+  console.log('🔵 Atualizando múltiplos tickets:');
+  console.log('eventId:', eventId);
+  console.log('updates:', updates);
+
+  const data = {
+    eventId: eventId,
+    tickets: updates.map(update => ({
+      ticketId: update.ticketId,
+      totalQuantity: update.totalQuantity,
+      changeReason: update.changeReason || globalChangeReason,
+    })),
+    globalChangeReason: globalChangeReason || 'Ajuste em lote pelo organizador',
+  };
+
+  const response = await api.put(
+    `/ticket/event/${eventId}/tickets/batch`,
+    data,
   );
   return response.data;
 };

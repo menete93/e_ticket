@@ -1,4 +1,4 @@
-// screens/Login/Login.style.js
+// screens/Register/Register.style.js
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
@@ -12,17 +12,12 @@ export default StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 40,
   },
-  logo: {
-    width: 90,
-    height: 90,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
     color: '#1F2937',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
@@ -53,11 +48,44 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  forgot: {
-    textAlign: 'center',
-    color: '#4F46E5',
-    marginTop: 10,
+  organizerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0fdf4',
+    padding: 16,
+    borderRadius: 12,
+    marginVertical: 16,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#10B981',
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#10B981',
+  },
+  checkmark: {
+    color: '#fff',
     fontSize: 14,
+    fontWeight: 'bold',
+  },
+  organizerTextContainer: {
+    flex: 1,
+  },
+  organizerTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#166534',
+  },
+  organizerSubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
   },
   footer: {
     flexDirection: 'row',
@@ -68,7 +96,7 @@ export default StyleSheet.create({
     color: '#6B7280',
     fontSize: 14,
   },
-  registerText: {
+  loginText: {
     color: '#4F46E5',
     fontWeight: '600',
   },

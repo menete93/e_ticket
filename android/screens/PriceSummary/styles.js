@@ -122,4 +122,37 @@ export default StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+
+  // components/checkout/styles.js (adicione)
+  emptyText: {
+    textAlign: 'center',
+    color: '#999',
+    padding: 20,
+  },
+  strategiesContainer: {
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  strategiesTitle: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#10B981',
+    marginBottom: 8,
+  },
+  strategyRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  strategyName: {
+    fontSize: 12,
+    color: '#666',
+  },
+  strategyDiscount: {
+    fontSize: 12,
+    color: '#10B981',
+    fontWeight: '500',
+  },
 });

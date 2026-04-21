@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { createEvent } from './../../services/eventService';
-import { searchPlace } from './../../api/ticketApi';
+import { createEvent } from './../../../../services/eventService';
+import { searchPlace } from './../../../../api/ticketApi';
 import storage from '@react-native-firebase/storage';
 import RNFS from 'react-native-fs';
 import MapLibreGL from '@maplibre/maplibre-react-native';
@@ -19,14 +19,14 @@ import {
 } from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
-import getCategories from './../../services/categoryService';
+import getCategories from './../../../../services/categoryService';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import styles from './style';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 MapLibreGL.setAccessToken(null);
 
-const EventRegistrationScreen = ({ navigation, route }) => {
+const CreateEventScreen = ({ navigation, route }) => {
   // Estados principais
   const [createdEventId, setCreatedEventId] = useState(null);
   const [ticketConfig, setTicketConfig] = useState([]);
@@ -346,10 +346,11 @@ const EventRegistrationScreen = ({ navigation, route }) => {
   // ─── NAVEGAÇÃO PARA CONFIGURAÇÃO DE BILHETES ───────────────────
   const navigateToTicketConfig = eventId => {
     if (navigation) {
-      navigation.navigate('TicketConfiguration', {
+      navigation.navigate('TicketConfigurationScreen', {
         eventId: eventId,
         eventName: eventData.name,
         isFree: eventData.isFree,
+        maxAttendees: eventData.maxAttendees,
       });
     } else {
       Alert.alert('Info', 'Navegação não disponível');
@@ -1018,4 +1019,4 @@ const EventRegistrationScreen = ({ navigation, route }) => {
   );
 };
 
-export default EventRegistrationScreen;
+export default CreateEventScreen;

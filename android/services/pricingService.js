@@ -7,23 +7,6 @@ export async function getPricingStrategies() {
   return response.data; // [{ id, name }, ...]
 }
 
-// // 🔹 Cria uma nova estratégia //bullk
-// export async function applyMultipleStrategiesToEvent(payload) {
-//   const response = await api.post(
-//     '/api/pricing/strategies/bulk-create',
-//     payload,
-//   );
-//   console.log('PricingStrategy', response);
-//   return response.data; // [{ id, name }, ...]
-// }
-
-// // 🔹 Cria uma nova estratégia
-// export async function applyMultipleStrategiesToEvent(payload) {
-//   const response = await api.post('/api/pricing/strategies/create', payload);
-//   console.log('PricingStrategy', response);
-//   return response.data; // [{ id, name }, ...]
-// }
-
 export const applyMultipleStrategiesToEvent = async payload => {
   try {
     // A resposta já vem com a estrutura que você mostrou
@@ -54,34 +37,8 @@ export const applyStrategyToEvent = async payload => {
   return response.data;
 };
 
-// export const applyMultipleStrategiesToEvent = async payload => {
-//   const response = await api.post(
-//     '/pricing/strategies/apply-multiple',
-//     payload,
-//   );
-//   return response.data;
-// };
-
-// Buscar estratégias de um evento
-// getEventStrategies: async (eventId) => {
-//   const response = await api.get(`/strategies/event/${eventId}`);
-//   return response.data;
-// },
-
 // Buscar estratégia por ID DO EVENTO
 export const getEventStrategies = async eventId => {
   const response = await api.get(`/api/pricing/strategies/event/${eventId}`);
   return response.data;
 };
-
-// // Atualizar estratégia
-// updateStrategy: async (id, data) => {
-//   const response = await api.put(`/strategies/${id}`, data);
-//   return response.data;
-// },
-
-// // Deletar estratégia
-// deleteStrategy: async (id) => {
-//   const response = await api.delete(`/strategies/${id}`);
-//   return response.data;
-// }

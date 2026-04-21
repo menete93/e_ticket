@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import { getTickets } from '../../services/ticket.service';
+import { getTickets } from './../../services/ticketService';
 import styles from './styles';
 
 export const TicketSelector = ({ eventId, onSelectionChange, disabled }) => {
@@ -18,37 +18,92 @@ export const TicketSelector = ({ eventId, onSelectionChange, disabled }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ✅ CORRIGIDO: useCallback para memoizar a função
   const loadTickets = useCallback(async () => {
+    if (!eventId) {
+      console.log('⚠️ TicketSelector: eventId não fornecido');
+      setError('ID do evento não fornecido');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
+
+      console.log('🔍 TicketSelector: Buscando tickets para eventId:', eventId);
+
       const response = await getTickets(eventId);
-      const ticketsData = Array.isArray(response)
-        ? response
-        : response.data || [];
-      setTickets(ticketsData);
+
+      console.log(
+        '📦 TicketSelector: Resposta recebida:',
+        JSON.stringify(response, null, 2),
+      );
+
+      // Trata diferentes formatos de resposta
+      let ticketsData = [];
+
+      if (response?.data?.data) {
+        ticketsData = response.data.data;
+      } else if (response?.data && Array.isArray(response.data)) {
+        ticketsData = response.data;
+      } else if (Array.isArray(response)) {
+        ticketsData = response;
+      } else if (response?.data && typeof response.data === 'object') {
+        ticketsData = [response.data];
+      } else {
+        console.warn('⚠️ Formato de resposta não reconhecido:', response);
+        ticketsData = [];
+      }
+
+      console.log(
+        '✅ TicketSelector: Tickets processados:',
+        ticketsData.length,
+      );
+
+      // Mapeia os campos
+      const mappedTickets = ticketsData.map(ticket => ({
+        id: ticket.id,
+        ticketName: ticket.name || ticket.ticketName || 'Ingresso',
+        name: ticket.name,
+        price: ticket.price || 0,
+        description: ticket.description || '',
+        availableQuantity:
+          ticket.availableQuantity || ticket.available_quantity || 0,
+        maxTicketsPerUser:
+          ticket.maxPerPerson || ticket.maxTicketsPerUser || 10,
+        category: ticket.category || 'regular',
+        isAvailable: (ticket.availableQuantity || 0) > 0,
+        benefits: ticket.benefits || [],
+      }));
+
+      setTickets(mappedTickets);
 
       const initialQuantities = {};
-      ticketsData.forEach(ticket => {
+      mappedTickets.forEach(ticket => {
         initialQuantities[ticket.id] = 0;
       });
       setQuantities(initialQuantities);
+
+      onSelectionChange(initialQuantities);
     } catch (err) {
-      console.error('Erro ao carregar tickets:', err);
-      setError('Não foi possível carregar os ingressos');
+      console.error('❌ TicketSelector: Erro ao carregar tickets:', err);
+      setError(
+        err.response?.data?.message || 'Não foi possível carregar os ingressos',
+      );
     } finally {
       setLoading(false);
     }
-  }, [eventId]); // ✅ dependência correta
+  }, [eventId, onSelectionChange]);
 
-  // ✅ CORRIGIDO: inclui loadTickets como dependência
   useEffect(() => {
     loadTickets();
-  }, [loadTickets]); // ✅ agora loadTickets é estável
+  }, [loadTickets]);
 
   const handleQuantityChange = (ticketId, quantity) => {
     const newQuantity = parseInt(quantity) || 0;
     const ticket = tickets.find(t => t.id === ticketId);
+
+    if (!ticket) return;
 
     if (ticket.maxTicketsPerUser && newQuantity > ticket.maxTicketsPerUser) {
       Alert.alert(
@@ -106,6 +161,16 @@ export const TicketSelector = ({ eventId, onSelectionChange, disabled }) => {
     );
   }
 
+  if (tickets.length === 0 && !loading) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>
+          Nenhum ingresso disponível para este evento
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Selecione seus ingressos</Text>
@@ -131,7 +196,12 @@ export const TicketSelector = ({ eventId, onSelectionChange, disabled }) => {
                 </View>
               )}
             </View>
-            <Text style={styles.ticketPrice}>{ticket.price} MT</Text>
+            <Text style={styles.ticketPrice}>
+              {typeof ticket.price === 'number'
+                ? ticket.price.toFixed(2)
+                : ticket.price}{' '}
+              MT
+            </Text>
             {ticket.description && (
               <Text style={styles.ticketDescription}>{ticket.description}</Text>
             )}

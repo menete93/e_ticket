@@ -1,26 +1,44 @@
+// components/Input/InputField.style.js
 import { StyleSheet } from 'react-native';
-import getFontFamily from '../../../assets/helper';
-import {
-  horizontalScale,
-  scaleFontSize,
-  verticalScale,
-} from '../../../assets/styles/scaling';
 
-const style = StyleSheet.create({
+export default StyleSheet.create({
+  container: {
+    marginBottom: 16,
+  },
   label: {
-    fontFamily: getFontFamily(2, 500),
-    fontSize: scaleFontSize(15),
-    lineHeight: scaleFontSize(13),
-    color: '#36455A',
-    paddingVertical: verticalScale(25),
-    marginHorizontal: horizontalScale(5),
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 6,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    backgroundColor: '#F9FAFB',
+    paddingHorizontal: 12,
+  },
+  inputFocused: {
+    borderColor: '#4F46E5',
+    backgroundColor: '#FFFFFF',
+  },
+  inputError: {
+    borderColor: '#EF4444',
   },
   input: {
-    marginTop: verticalScale(1),
-    paddingVertical: verticalScale(10),
-    borderBottomWidth: 1, //linha na horizontal
-    borderBottomColor: 'rgb(167,167,167,0.5)',
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#1F2937',
+  },
+  iconButton: {
+    padding: 8,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#EF4444',
+    marginTop: 4,
   },
 });
-
-export default style;

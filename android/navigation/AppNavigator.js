@@ -1,61 +1,38 @@
-// import React from 'react';
-// import { NavigationContainer } from '@react-navigation/native';
-// import { createStackNavigator } from '@react-navigation/stack';
-// import LoginScreen from '../screens/LoginScreen';
-// import DrawerNavigator from './DrawerNavigator';
-// import Login from './../screens/Login/Login';
-// import TicketConfigurationScreen from './../screens/TicketConfigurationScreen/TicketConfigurationScreen';
-
-// const Stack = createStackNavigator();
-
-// export default function AppNavigator() {
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator
-//         initialRouteName="Login"
-//         screenOptions={{ headerShown: false }}
-//       >
-//         <Stack.Screen name="Login" component={Login} />
-
-//         <Stack.Screen name="Main" component={DrawerNavigator} />
-//         <Stack.Screen
-//           name="TicketConfiguration"
-//           component={TicketConfigurationScreen}
-//         />
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// }
-
+// navigation/AppNavigator.js
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ActivityIndicator, View } from 'react-native';
+import { useAuth } from './../contexts/authContext';
 
-import DrawerNavigator from './DrawerNavigator';
-import Login from './../screens/Login/Login';
-import TicketConfigurationScreen from './../screens/TicketConfigurationScreen/TicketConfigurationScreen';
-import BottomTabs from './BottomTabs';
+import LoginScreen from '../screens/Login/Login';
+import RegisterScreen from '../screens/Register/Register';
+import MainNavigator from './MainNavigator';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
+  const { user, loading } = useAuth(); // Usando o hook personalizado
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#4F46E5" />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Login"
-        screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="Login" component={Login} />
-
-        <Stack.Screen name="Main" component={DrawerNavigator} />
-
-        {/* Tabs no rodapé */}
-        <Stack.Screen name="MainTabs" component={BottomTabs} />
-
-        <Stack.Screen
-          name="TicketConfiguration"
-          component={TicketConfigurationScreen}
-        />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {!user ? (
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+          </>
+        ) : (
+          <Stack.Screen name="Main" component={MainNavigator} />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

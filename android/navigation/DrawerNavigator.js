@@ -5,9 +5,9 @@ import MainTabs from './MainTabs';
 import SettingsScreen from '../screens/SettingsScreen';
 import colors from '../theme/colors';
 import CategoryRegistry from './../screens/CategoriesRegistry/CategoryRegistry';
-import HomeScreen from '../screens/HomeScreen/HomeScreen';
+import HomeScreen from '../screens/HomeScreen/HomeScreens';
 import CustomDrawerContent from './../components/CustomDrawerContent/CustomDrawerContent';
-import EventRegistrationScreen from './../screens/EventRegistry/EventRegistry';
+import CreateEventScreen from '../screens/organizer/screens/createEvent/CreateEventScreen';
 import PricingStrategyScreen from './../screens/PricingStrategy/PricingStrategyScreen';
 import BottomTabs from './BottomTabs';
 
@@ -59,7 +59,7 @@ export default function DrawerNavigator() {
       />
       <Drawer.Screen
         name="Adicionar evento"
-        component={EventRegistrationScreen}
+        component={CreateEventScreen}
         options={{
           // eslint-disable-next-line react/no-unstable-nested-components
           drawerIcon: ({ color, size }) => (

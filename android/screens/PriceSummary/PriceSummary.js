@@ -15,7 +15,8 @@ export const PriceSummary = ({ priceCalculation, onApplyCoupon, loading }) => {
   const [applyingCoupon, setApplyingCoupon] = useState(false);
 
   const formatMoney = value => {
-    return `${value} MT`;
+    if (value === undefined || value === null) return '0 MT';
+    return `${value.toFixed(2)} MT`;
   };
 
   const handleApplyCoupon = async () => {
@@ -37,23 +38,39 @@ export const PriceSummary = ({ priceCalculation, onApplyCoupon, loading }) => {
     onApplyCoupon('');
   };
 
+  // Se não tem priceCalculation, não mostra nada
+  if (!priceCalculation) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Resumo do Pedido</Text>
+        <Text style={styles.emptyText}>Selecione os ingressos</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Resumo do Pedido</Text>
 
-      <View style={styles.summaryItems}>
-        {priceCalculation.items?.map((item, index) => (
-          <View key={index} style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>
-              {item.quantity}x {item.ticketName}
-            </Text>
-            <Text style={styles.summaryValue}>{formatMoney(item.total)}</Text>
-          </View>
-        ))}
-      </View>
+      {/* Items do breakdown */}
+      {priceCalculation.breakdown && priceCalculation.breakdown.length > 0 && (
+        <View style={styles.summaryItems}>
+          {priceCalculation.breakdown.map((item, index) => (
+            <View key={index} style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>
+                {item.quantity}x {item.ticketName}
+              </Text>
+              <Text style={styles.summaryValue}>
+                {formatMoney(item.subtotal)}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       <View style={styles.divider} />
 
+      {/* Subtotal */}
       <View style={styles.summaryRow}>
         <Text style={styles.summaryLabel}>Subtotal</Text>
         <Text style={styles.summaryValue}>
@@ -61,6 +78,7 @@ export const PriceSummary = ({ priceCalculation, onApplyCoupon, loading }) => {
         </Text>
       </View>
 
+      {/* Desconto */}
       {priceCalculation.discount > 0 && (
         <View style={[styles.summaryRow, styles.discountRow]}>
           <Text style={styles.discountLabel}>Desconto</Text>
@@ -70,6 +88,7 @@ export const PriceSummary = ({ priceCalculation, onApplyCoupon, loading }) => {
         </View>
       )}
 
+      {/* Cupom aplicado (se houver) */}
       {priceCalculation.appliedCoupon && (
         <View style={styles.appliedCouponContainer}>
           <Text style={styles.appliedCouponText}>
@@ -81,13 +100,30 @@ export const PriceSummary = ({ priceCalculation, onApplyCoupon, loading }) => {
         </View>
       )}
 
+      {/* Estratégias aplicadas */}
+      {priceCalculation.appliedStrategies &&
+        priceCalculation.appliedStrategies.length > 0 && (
+          <View style={styles.strategiesContainer}>
+            <Text style={styles.strategiesTitle}>Estratégias aplicadas:</Text>
+            {priceCalculation.appliedStrategies.map((strategy, index) => (
+              <View key={index} style={styles.strategyRow}>
+                <Text style={styles.strategyName}>{strategy.strategyName}</Text>
+                <Text style={styles.strategyDiscount}>
+                  - {formatMoney(strategy.discount)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
       <View style={[styles.summaryRow, styles.totalRow]}>
         <Text style={styles.totalLabel}>Total</Text>
         <Text style={styles.totalValue}>
-          {formatMoney(priceCalculation.total)}
+          {formatMoney(priceCalculation.finalPrice)}
         </Text>
       </View>
 
+      {/* Botão de cupom */}
       {!priceCalculation.appliedCoupon && !showCouponInput && (
         <TouchableOpacity
           style={styles.couponButton}
@@ -100,6 +136,7 @@ export const PriceSummary = ({ priceCalculation, onApplyCoupon, loading }) => {
         </TouchableOpacity>
       )}
 
+      {/* Input do cupom */}
       {showCouponInput && (
         <View style={styles.couponInputGroup}>
           <TextInput
