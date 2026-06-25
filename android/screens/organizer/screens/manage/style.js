@@ -43,7 +43,53 @@ export default StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     marginTop: 4,
   },
-  // ==================== BANNER DE CAPACIDADE ====================
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  batchButton: {
+    padding: 8,
+  },
+  addButton: {
+    padding: 8,
+  },
+  // ==================== BANNERS ====================
+  disabledBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    margin: 16,
+    marginBottom: 8,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+    gap: 12,
+  },
+  disabledBannerText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#991B1B',
+    fontWeight: '500',
+  },
+  warningBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    margin: 16,
+    marginBottom: 8,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    gap: 12,
+  },
+  warningBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#92400E',
+  },
   capacityBanner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -72,14 +118,6 @@ export default StyleSheet.create({
   capacityBannerTitleError: {
     color: '#991B1B',
   },
-  capacityBannerText: {
-    fontSize: 13,
-    color: '#3B82F6',
-    fontWeight: '500',
-  },
-  capacityBannerTextError: {
-    color: '#EF4444',
-  },
   capacityBannerSubtext: {
     fontSize: 12,
     color: '#6B7280',
@@ -101,49 +139,28 @@ export default StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
+  disabledCard: {
+    opacity: 0.7,
+    backgroundColor: '#F9FAFB',
+  },
   ticketHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 12,
   },
-  ticketIconContainer: {
-    marginRight: 12,
-  },
-  ticketIconGradient: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  ticketTitle: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 8,
   },
-  ticketInfo: {
-    flex: 1,
+  ticketIcon: {
+    fontSize: 20,
   },
   ticketName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#1F2937',
-    marginBottom: 4,
-  },
-  ticketDescription: {
-    fontSize: 12,
-    color: '#6B7280',
-    lineHeight: 16,
-  },
-  editQuantityButton: {
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#EFF6FF',
-    borderRadius: 8,
-    flexDirection: 'row',
-    gap: 4,
-  },
-  editQuantityText: {
-    fontSize: 12,
-    color: '#4F46E5',
-    fontWeight: '500',
   },
   // ==================== ESTATÍSTICAS ====================
   statsGrid: {
@@ -164,55 +181,16 @@ export default StyleSheet.create({
     marginBottom: 4,
   },
   statNumber: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1E293B',
   },
-  soldNumber: {
-    color: '#10B981',
-  },
-  statSubtext: {
-    fontSize: 9,
-    color: '#94A3B8',
-    marginTop: 2,
-  },
-  // ==================== PROGRESSO ====================
-  progressSection: {
-    marginTop: 12,
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 10,
-    color: '#64748B',
-    marginTop: 6,
-    textAlign: 'right',
-  },
-  // ==================== PREÇO COM ESTRATÉGIAS ====================
+  // ==================== PREÇO ====================
   priceContainer: {
     backgroundColor: '#F8FAFC',
     borderRadius: 12,
     padding: 12,
     marginTop: 12,
-  },
-  priceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 10,
-  },
-  priceHeaderText: {
-    fontSize: 12,
-    color: '#4F46E5',
-    fontWeight: '500',
   },
   priceRow: {
     flexDirection: 'row',
@@ -229,34 +207,6 @@ export default StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
     color: '#1E293B',
-  },
-  strategiesContainer: {
-    marginTop: 8,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
-  },
-  strategiesTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#64748B',
-    marginBottom: 6,
-  },
-  strategyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 4,
-  },
-  strategyName: {
-    fontSize: 12,
-    color: '#334155',
-    flex: 1,
-  },
-  strategyImpact: {
-    fontSize: 11,
-    color: '#10B981',
-    fontWeight: '500',
   },
   finalPriceRow: {
     flexDirection: 'row',
@@ -283,16 +233,85 @@ export default StyleSheet.create({
   infoNote: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
     marginTop: 10,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
+    gap: 6,
   },
   infoNoteText: {
-    fontSize: 10,
-    color: '#64748B',
+    fontSize: 11,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  // ==================== BATCH MODE ====================
+  batchInput: {
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 16,
+    textAlign: 'center',
+    minWidth: 80,
+  },
+  batchFooter: {
+    padding: 16,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  batchFooterInfo: {
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  batchFooterText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1F2937',
+    textAlign: 'center',
+  },
+  batchFooterSubtext: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  batchFooterButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  batchCancelButton: {
     flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  batchSaveButton: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  buttonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   // ==================== MODAL ====================
   modalOverlay: {
@@ -311,12 +330,11 @@ export default StyleSheet.create({
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     padding: 20,
-    gap: 8,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
   },
@@ -333,7 +351,6 @@ export default StyleSheet.create({
   },
   inputGroup: {
     marginBottom: 20,
-    paddingHorizontal: 20,
   },
   label: {
     fontSize: 14,
@@ -350,13 +367,9 @@ export default StyleSheet.create({
     backgroundColor: '#F9FAFB',
     color: '#1F2937',
   },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
   helperText: {
     fontSize: 11,
-    color: '#999',
+    color: '#6B7280',
     marginTop: 4,
   },
   warningBox: {
@@ -373,6 +386,27 @@ export default StyleSheet.create({
     color: '#92400E',
     flex: 1,
   },
+  categorySelector: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
+  },
+  categoryOption: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+  },
+  categoryOptionIcon: {
+    fontSize: 24,
+  },
+  categoryOptionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginTop: 4,
+  },
   modalButtons: {
     flexDirection: 'row',
     padding: 20,
@@ -385,9 +419,6 @@ export default StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
   },
   modalCancelButton: {
     backgroundColor: '#F3F4F6',
@@ -413,32 +444,68 @@ export default StyleSheet.create({
     color: '#999',
     marginTop: 12,
   },
-  emptyStateSubtext: {
+  createTicketButtonText: {
     fontSize: 14,
-    color: '#ccc',
-    marginTop: 4,
+    color: '#4F46E5',
+    marginTop: 8,
+    textDecorationLine: 'underline',
   },
-  batchButton: {
-    padding: 8,
-  },
-  batchInput: {
-    backgroundColor: '#F9FAFB',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
-    padding: 8,
-    fontSize: 16,
-    textAlign: 'center',
-    minWidth: 80,
-  },
-  batchFooter: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  batchSaveButton: {
+  // ManageTicketsScreen.style.js - Adicione
+
+  // ==================== BADGES DE ESTRATÉGIA ====================
+  noStrategyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
     borderRadius: 12,
-    overflow: 'hidden',
+    marginTop: 4,
+    gap: 4,
+    alignSelf: 'flex-start',
+  },
+  noStrategyBadgeText: {
+    fontSize: 10,
+    color: '#92400E',
+    fontWeight: '500',
+  },
+  hasStrategyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginTop: 4,
+    gap: 4,
+    alignSelf: 'flex-start',
+  },
+  hasStrategyBadgeText: {
+    fontSize: 10,
+    color: '#065F46',
+    fontWeight: '500',
+  },
+  // ManageTicketsScreen.style.js - Adicione
+
+  capacityWarningModal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    backgroundColor: '#FEF2F2',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    gap: 8,
+  },
+  capacityWarningModalText: {
+    fontSize: 13,
+    color: '#991B1B',
+    flex: 1,
+  },
+  capacityWarningModalLink: {
+    fontSize: 13,
+    color: '#4F46E5',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
 });

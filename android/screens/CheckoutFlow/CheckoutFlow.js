@@ -106,59 +106,107 @@ const CheckoutFlow = () => {
   };
 
   const handleProceedToCheckout = async () => {
-    if (!finalPriceCalculation) return;
+    console.log('🚀 handleProceedToCheckout INICIADO');
+
+    if (!finalPriceCalculation) {
+      console.log('❌ Sem finalPriceCalculation');
+      return;
+    }
 
     const ticketEntry = Object.entries(quantities).find(([_, qty]) => qty > 0);
-    if (!ticketEntry) return;
+    if (!ticketEntry) {
+      console.log('❌ Nenhum ticket encontrado');
+      return;
+    }
 
     const [ticketId, quantity] = ticketEntry;
 
-    try {
-      await createCheckout({
-        ticketId: parseInt(ticketId),
-        quantity,
-        couponCode: couponCode || undefined,
-        buyerEmail: buyerInfo.email,
-        buyerName: buyerInfo.name,
-        buyerPhone: buyerInfo.phone,
-        paymentMethod: 'MPESA',
-        userId: user.id,
-        expectedTotalAmount: finalPriceCalculation.finalPrice,
-      });
+    const checkoutData = {
+      ticketId: parseInt(ticketId),
+      quantity,
+      couponCode: couponCode || undefined,
+      buyerName: buyerInfo.name,
+      buyerEmail: buyerInfo.email,
+      buyerPhone: buyerInfo.phone,
+      paymentMethodCode: 'MPESA',
+      userId: user.id,
+      eventId: eventId,
+      expectedTotalAmount: finalPriceCalculation.finalPrice,
+    };
 
-      setShowMpesaModal(true);
+    console.log('📦 DADOS ENVIADOS:', JSON.stringify(checkoutData, null, 2));
+
+    try {
+      console.log('🔄 Chamando checkout...');
+      const result = await createCheckout(checkoutData);
+      console.log('✅ checkout SUCESSO!', result);
+
+      // ✅ O resultado deve conter transactionId
+      if (result && result.transactionId) {
+        setShowMpesaModal(true);
+      } else {
+        Alert.alert('Erro', 'Resposta inválida do servidor');
+      }
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível criar a venda');
+      console.error('❌ ERRO no checkout:', error);
+      Alert.alert(
+        'Erro',
+        error.response?.data?.message || 'Não foi possível criar a venda',
+      );
     }
   };
 
   const handleMpesaPayment = async phoneNumber => {
-    if (!currentSale) return;
+    if (!currentSale) {
+      Alert.alert('Erro', 'Venda não encontrada');
+      return;
+    }
+
+    // ✅ Usar saleId que agora está preenchido com result.id
+    if (!currentSale.saleId) {
+      console.error('❌ saleId não encontrado no currentSale:', currentSale);
+      Alert.alert('Erro', 'Dados da venda incompletos. Tente novamente.');
+      return;
+    }
+
+    console.log('📦 Enviando pagamento com:', {
+      transactionId: currentSale.transactionId,
+      saleId: currentSale.saleId,
+      phoneNumber: phoneNumber,
+    });
 
     try {
-      const checkoutRequestId = await initiateMpesaPayment(
+      const result = await initiateMpesaPayment(
         currentSale.transactionId,
         phoneNumber,
-        currentSale.totalAmount,
+        currentSale.saleId,
       );
 
-      await confirmPayment(
-        currentSale.transactionId,
-        'MPESA',
-        checkoutRequestId,
-      );
+      console.log('✅ Resultado do pagamento:', result);
 
-      setShowMpesaModal(false);
-      setShowSuccessModal(true);
-      setStep('success');
+      if (result && result.success === true) {
+        setShowMpesaModal(false);
+        setShowSuccessModal(true);
+        setStep('success');
+      } else if (result && result.pending === true) {
+        Alert.alert(
+          'Pagamento Pendente',
+          result.message || 'Aguardando confirmação',
+        );
+      } else {
+        Alert.alert(
+          'Erro no Pagamento',
+          result?.message || 'Pagamento não autorizado',
+        );
+      }
     } catch (error) {
+      console.error('❌ Erro no pagamento:', error);
       Alert.alert(
         'Erro no Pagamento',
-        error.message || 'Falha ao processar pagamento',
+        error.response?.data?.message || 'Falha ao processar pagamento',
       );
     }
   };
-
   const isFormValid = () => {
     return buyerInfo.email && buyerInfo.name && buyerInfo.phone;
   };
@@ -188,7 +236,6 @@ const CheckoutFlow = () => {
         <Text style={styles.headerTitle}>Finalizar Compra</Text>
         <View style={{ width: 40 }} />
       </LinearGradient>
-
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Evento */}
         <View style={styles.eventSection}>
@@ -397,7 +444,6 @@ const CheckoutFlow = () => {
 
         <View style={{ height: 100 }} />
       </ScrollView>
-
       {/* Botão fixo no final */}
       {step === 'selection' && finalPrice > 0 && (
         <View style={styles.fixedButton}>
@@ -427,19 +473,17 @@ const CheckoutFlow = () => {
           </TouchableOpacity>
         </View>
       )}
-
       {/* Modais */}
       {showMpesaModal && currentSale && (
         <MpesaPaymentModal
           isOpen={showMpesaModal}
-          sale={currentSale}
+          sale={currentSale} // ← passa o objeto inteiro
           buyerPhone={buyerInfo.phone}
           onClose={() => setShowMpesaModal(false)}
           onConfirmPayment={handleMpesaPayment}
           loading={loading}
         />
       )}
-
       {/* Toast de Erro */}
       {error && (
         <View style={styles.errorToast}>

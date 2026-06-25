@@ -273,4 +273,57 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  // style.js - Adicione estes estilos
+
+  quantityInput: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    textAlign: 'center',
+    minWidth: 50,
+    paddingVertical: 8,
+  },
+
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
+
+  clearButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+  },
+
+  clearButtonText: {
+    color: '#6B7280',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+  calculateButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+
+  calculateGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 8,
+  },
+
+  calculateButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+
+  
 });

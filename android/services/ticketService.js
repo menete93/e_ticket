@@ -35,8 +35,34 @@ export const calculatePrice = async data => {
   }
 };
 
+// services/ticketService.js
 export const checkout = async data => {
-  const response = await api.post('/api/v1/tickets/checkout', data);
+  // 🔥 LOG ANTES DE ENVIAR
+  console.log('🚀 ==== ENVIANDO REQUEST ====');
+  console.log('📦 Dados completos:', JSON.stringify(data, null, 2));
+  console.log('📦 paymentMethod:', data.paymentMethod);
+  console.log('📦 ticketId:', data.ticketId);
+  console.log('📦 quantity:', data.quantity);
+  console.log('📦 expectedTotalAmount:', data.expectedTotalAmount);
+  console.log('============================');
+
+  const response = await api.post('/api/v1/tickets/checkout', {
+    ticketId: data.ticketId,
+    quantity: data.quantity,
+    couponCode: data.couponCode,
+    buyerName: data.buyerName,
+    buyerEmail: data.buyerEmail,
+    paymentMethod: data.paymentMethod,
+    userId: data.userId,
+    eventId: data.eventId,
+    expectedTotalAmount: data.expectedTotalAmount,
+  });
+
+  // 🔥 LOG DEPOIS DE RECEBER RESPOSTA
+  console.log('✅ ==== RESPOSTA RECEBIDA ====');
+  console.log('Resposta:', JSON.stringify(response.data, null, 2));
+  console.log('==============================');
+
   return response.data;
 };
 
@@ -101,8 +127,6 @@ export const checkMpesaPaymentStatus = async transactionReference => {
   );
   return response.data;
 };
-
-// services/ticketService.js
 
 export const batchUpdateTickets = async (
   eventId,

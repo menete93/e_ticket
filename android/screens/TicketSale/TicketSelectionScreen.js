@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // screens/tickets/TicketSelectionScreen.js
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
@@ -24,7 +25,9 @@ export default function TicketSelectionScreen({ route, navigation }) {
   const [loadingUser, setLoadingUser] = useState(true);
   const [tickets, setTickets] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [tempQuantities, setTempQuantities] = useState({});
   const [loading, setLoading] = useState(false);
+  const [calculating, setCalculating] = useState(false);
   const [priceCalculation, setPriceCalculation] = useState(null);
   const [couponCode, setCouponCode] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
@@ -32,9 +35,8 @@ export default function TicketSelectionScreen({ route, navigation }) {
   const [showStrategies, setShowStrategies] = useState(false);
   const [error, setError] = useState(null);
 
-  // Refs para evitar loops
-  const isFirstRender = useRef(true);
-  const isCalculating = useRef(false);
+  // ✅ NOVO: Estado para controlar se o cálculo já foi feito
+  const [hasCalculated, setHasCalculated] = useState(false);
 
   // Buscar usuário (apenas uma vez)
   useEffect(() => {
@@ -58,10 +60,9 @@ export default function TicketSelectionScreen({ route, navigation }) {
     if (event?.id) {
       loadTicketData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event?.id]);
+  }, [event?.id, loadTicketData]);
 
-  const loadTicketData = async () => {
+  const loadTicketData = useCallback(async () => {
     if (!event?.id) return;
 
     try {
@@ -75,6 +76,10 @@ export default function TicketSelectionScreen({ route, navigation }) {
         ticketsData = Array.isArray(response.data)
           ? response.data
           : [response.data];
+      } else if (Array.isArray(response)) {
+        ticketsData = response;
+      } else {
+        ticketsData = [];
       }
 
       setTickets(ticketsData);
@@ -84,6 +89,7 @@ export default function TicketSelectionScreen({ route, navigation }) {
         initialQuantities[ticket.id] = 0;
       });
       setQuantities(initialQuantities);
+      setTempQuantities(initialQuantities);
 
       // Buscar estratégias
       try {
@@ -99,42 +105,51 @@ export default function TicketSelectionScreen({ route, navigation }) {
     } finally {
       setLoading(false);
     }
-  };
+  });
 
-  // Calcular preço (apenas quando quantities mudar)
-  useEffect(() => {
-    // Pular na primeira renderização
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const hasTickets = Object.values(quantities).some(q => q > 0);
-    if (hasTickets && !isCalculating.current) {
-      calculateTotalPrice();
-    } else {
-      setPriceCalculation(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quantities]);
+  // ✅ FUNÇÃO PARA CALCULAR PREÇO
   const calculateTotalPrice = async () => {
     const selectedQuantities = {};
 
-    Object.entries(quantities).forEach(([ticketId, qty]) => {
+    Object.entries(tempQuantities).forEach(([ticketId, qty]) => {
       if (qty > 0) {
         selectedQuantities[ticketId] = qty;
       }
     });
 
+    // Verificar se tem pelo menos um ingresso selecionado
     if (Object.keys(selectedQuantities).length === 0) {
-      setPriceCalculation(null);
-      return;
+      Alert.alert('Atenção', 'Selecione pelo menos um ingresso');
+      setHasCalculated(false);
+      return false;
     }
 
-    if (isCalculating.current) return;
-    isCalculating.current = true;
+    // Validar quantidades
+    for (const [ticketId, qty] of Object.entries(selectedQuantities)) {
+      const ticket = tickets.find(t => t.id === parseInt(ticketId));
+      if (ticket) {
+        if (ticket.maxPerPerson && qty > ticket.maxPerPerson) {
+          Alert.alert(
+            'Limite excedido',
+            `Máximo de ${ticket.maxPerPerson} ingressos para ${ticket.name}`,
+          );
+          setHasCalculated(false);
+          return false;
+        }
+        if (ticket.availableQuantity && qty > ticket.availableQuantity) {
+          Alert.alert(
+            'Indisponível',
+            `Apenas ${ticket.availableQuantity} ingressos disponíveis para ${ticket.name}`,
+          );
+          setHasCalculated(false);
+          return false;
+        }
+      }
+    }
 
     try {
+      setCalculating(true);
+
       const payload = {
         eventId: event.id,
         ticketQuantities: selectedQuantities,
@@ -143,20 +158,14 @@ export default function TicketSelectionScreen({ route, navigation }) {
         email: user?.email,
       };
 
-      console.log('📤 Payload enviado:', JSON.stringify(payload, null, 2));
+      console.log('📤 Calculando preço:', JSON.stringify(payload, null, 2));
 
       const response = await calculatePrice(payload);
 
-      // ✅ CORREÇÃO: O response JÁ É o objeto, não response.data
-      console.log('📥 Resposta recebida:', response);
-
-      // Verifica se a resposta existe
       if (!response) {
-        console.error('❌ Resposta vazia do backend');
         throw new Error('Backend não retornou dados');
       }
 
-      // ✅ Agora usa response diretamente, não response.data
       setPriceCalculation({
         subtotal: response.subtotal || 0,
         discount: response.totalSavings || 0,
@@ -164,82 +173,88 @@ export default function TicketSelectionScreen({ route, navigation }) {
         breakdown: response.breakdown || [],
         appliedStrategies: response.appliedStrategies || [],
       });
+
+      // Atualizar quantidades oficiais
+      setQuantities(tempQuantities);
+
+      // ✅ MARCA QUE O CÁLCULO FOI REALIZADO
+      setHasCalculated(true);
+
+      return true;
     } catch (error) {
-      console.error('❌ Erro detalhado:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
-
-      // Fallback: cálculo local
-      let subtotal = 0;
-      const breakdown = [];
-
-      Object.entries(selectedQuantities).forEach(([ticketId, qty]) => {
-        const ticket = tickets.find(t => t.id === parseInt(ticketId));
-        if (ticket) {
-          const ticketTotal = (ticket.price || 0) * qty;
-          subtotal += ticketTotal;
-          breakdown.push({
-            ticketId: ticket.id,
-            ticketName: ticket.name,
-            quantity: qty,
-            unitPrice: ticket.price,
-            subtotal: ticketTotal,
-          });
-        }
-      });
-
-      setPriceCalculation({
-        subtotal,
-        discount: 0,
-        finalPrice: subtotal,
-        breakdown,
-        appliedStrategies: [],
-      });
+      console.error('❌ Erro ao calcular:', error);
+      Alert.alert('Erro', 'Não foi possível calcular o preço');
+      setHasCalculated(false);
+      return false;
     } finally {
-      isCalculating.current = false;
+      setCalculating(false);
     }
   };
-  const handleQuantityChange = (ticketId, increment) => {
-    setQuantities(prev => {
-      const currentQty = prev[ticketId] || 0;
-      const newQty = increment ? currentQty + 1 : Math.max(0, currentQty - 1);
 
-      const ticket = tickets.find(t => t.id === ticketId);
-      if (ticket?.maxPerPerson && newQty > ticket.maxPerPerson) {
-        Alert.alert(
-          'Limite',
-          `Máximo de ${ticket.maxPerPerson} ingressos por pessoa`,
-        );
-        return prev;
-      }
+  // ✅ ATUALIZAR QUANTIDADE TEMPORÁRIA (reseta o estado de cálculo)
+  const updateTempQuantity = (ticketId, value) => {
+    const newQuantity = parseInt(value) || 0;
+    const ticket = tickets.find(t => t.id === ticketId);
 
-      if (
-        ticket?.availableQuantity !== undefined &&
-        newQty > ticket.availableQuantity
-      ) {
-        Alert.alert(
-          'Indisponível',
-          `Apenas ${ticket.availableQuantity} ingresso(s) disponível(eis)`,
-        );
-        return prev;
-      }
+    if (!ticket) return;
 
-      return { ...prev, [ticketId]: newQty };
-    });
+    if (ticket.maxPerPerson && newQuantity > ticket.maxPerPerson) {
+      Alert.alert(
+        'Limite',
+        `Máximo de ${ticket.maxPerPerson} ingressos por pessoa`,
+      );
+      return;
+    }
+
+    if (
+      ticket.availableQuantity !== undefined &&
+      newQuantity > ticket.availableQuantity
+    ) {
+      Alert.alert(
+        'Indisponível',
+        `Apenas ${ticket.availableQuantity} ingresso(s) disponível(eis)`,
+      );
+      return;
+    }
+
+    setTempQuantities(prev => ({ ...prev, [ticketId]: newQuantity }));
+
+    // ✅ QUALQUER MUDANÇA NAS QUANTIDADES RESETA O CÁLCULO
+    setHasCalculated(false);
+    setPriceCalculation(null);
   };
 
+  const handleIncrement = ticketId => {
+    const currentQty = tempQuantities[ticketId] || 0;
+    updateTempQuantity(ticketId, currentQty + 1);
+  };
+
+  const handleDecrement = ticketId => {
+    const currentQty = tempQuantities[ticketId] || 0;
+    if (currentQty > 0) {
+      updateTempQuantity(ticketId, currentQty - 1);
+    }
+  };
+
+  // ✅ APLICAR CUPOM (recalcula)
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       Alert.alert('Atenção', 'Digite um código de cupom');
       return;
     }
 
+    const hasTickets = Object.values(tempQuantities).some(q => q > 0);
+    if (!hasTickets) {
+      Alert.alert('Atenção', 'Selecione os ingressos antes de aplicar o cupom');
+      return;
+    }
+
     try {
       setApplyingCoupon(true);
-      await calculateTotalPrice();
-      Alert.alert('Sucesso', 'Cupom aplicado!');
+      const success = await calculateTotalPrice();
+      if (success) {
+        Alert.alert('Sucesso', 'Cupom aplicado!');
+      }
     } catch (error) {
       Alert.alert('Erro', 'Cupom inválido');
     } finally {
@@ -247,11 +262,29 @@ export default function TicketSelectionScreen({ route, navigation }) {
     }
   };
 
-  const handleCheckout = () => {
+  // ✅ CONFIRMAR E IR PARA CHECKOUT
+  const handleCheckout = async () => {
+    // ✅ VERIFICA SE O CÁLCULO JÁ FOI FEITO
+    if (!hasCalculated) {
+      Alert.alert(
+        'Atenção',
+        'Por favor, clique em "Calcular Preço" antes de continuar para o pagamento.',
+        [{ text: 'OK' }],
+      );
+      return;
+    }
+
+    // Verificar se ainda tem ingressos selecionados
+    const hasTickets = Object.values(tempQuantities).some(q => q > 0);
+    if (!hasTickets) {
+      Alert.alert('Atenção', 'Selecione pelo menos um ingresso');
+      return;
+    }
+
     const selectedQuantities = {};
     const selectedTicketsList = [];
 
-    Object.entries(quantities).forEach(([ticketId, qty]) => {
+    Object.entries(tempQuantities).forEach(([ticketId, qty]) => {
       if (qty > 0) {
         selectedQuantities[ticketId] = qty;
         const ticket = tickets.find(t => t.id === parseInt(ticketId));
@@ -259,20 +292,7 @@ export default function TicketSelectionScreen({ route, navigation }) {
       }
     });
 
-    if (selectedTicketsList.length === 0) {
-      Alert.alert('Atenção', 'Selecione pelo menos um ingresso');
-      return;
-    }
-
-    console.log('🔍🔍🔍 Navegando para Checkout com:', {
-      eventId: event.id,
-      eventName: event.name,
-      userId: user?.id,
-      hasEvent: !!event,
-    });
-
-    // ✅ CORRIGIDO: Mudar 'CheckoutFlow' para 'Checkout'
-    navigation.navigate('CheckoutFlow', {
+    navigation.navigate('Checkout', {
       event,
       selectedTickets: selectedTicketsList,
       quantities: selectedQuantities,
@@ -282,6 +302,18 @@ export default function TicketSelectionScreen({ route, navigation }) {
       user,
     });
   };
+
+  const clearQuantities = () => {
+    const cleared = {};
+    tickets.forEach(ticket => {
+      cleared[ticket.id] = 0;
+    });
+    setTempQuantities(cleared);
+    setPriceCalculation(null);
+    setHasCalculated(false); // ✅ RESETA O ESTADO DE CÁLCULO
+  };
+
+  const totalTickets = Object.values(tempQuantities).reduce((a, b) => a + b, 0);
 
   if (loadingUser || (loading && tickets.length === 0)) {
     return (
@@ -303,8 +335,6 @@ export default function TicketSelectionScreen({ route, navigation }) {
       </View>
     );
   }
-
-  const totalTickets = Object.values(quantities).reduce((a, b) => a + b, 0);
 
   return (
     <View style={styles.container}>
@@ -372,7 +402,7 @@ export default function TicketSelectionScreen({ route, navigation }) {
                 <View style={styles.priceContainer}>
                   <Text style={styles.priceLabel}>Preço:</Text>
                   <Text style={styles.normalPrice}>
-                    R$ {(ticket.price || 0).toFixed(2)}
+                    {(ticket.price || 0).toLocaleString()} MT
                   </Text>
                 </View>
 
@@ -390,32 +420,52 @@ export default function TicketSelectionScreen({ route, navigation }) {
                 <TouchableOpacity
                   style={[
                     styles.quantityButton,
-                    quantities[ticket.id] === 0 &&
+                    (tempQuantities[ticket.id] || 0) === 0 &&
                       styles.quantityButtonDisabled,
                   ]}
-                  onPress={() => handleQuantityChange(ticket.id, false)}
-                  disabled={quantities[ticket.id] === 0}
+                  onPress={() => handleDecrement(ticket.id)}
+                  disabled={(tempQuantities[ticket.id] || 0) === 0}
                 >
                   <Icon
                     name="minus"
                     size={20}
-                    color={quantities[ticket.id] === 0 ? '#9CA3AF' : '#6366F1'}
+                    color={
+                      (tempQuantities[ticket.id] || 0) === 0
+                        ? '#9CA3AF'
+                        : '#6366F1'
+                    }
                   />
                 </TouchableOpacity>
 
-                <Text style={styles.quantity}>
-                  {quantities[ticket.id] || 0}
-                </Text>
+                <TextInput
+                  style={styles.quantityInput}
+                  value={String(tempQuantities[ticket.id] || 0)}
+                  onChangeText={text => updateTempQuantity(ticket.id, text)}
+                  keyboardType="numeric"
+                  selectTextOnFocus
+                />
 
                 <TouchableOpacity
                   style={styles.quantityButton}
-                  onPress={() => handleQuantityChange(ticket.id, true)}
+                  onPress={() => handleIncrement(ticket.id)}
                 >
                   <Icon name="plus" size={20} color="#6366F1" />
                 </TouchableOpacity>
               </View>
             </View>
           ))
+        )}
+
+        {totalTickets > 0 && (
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={clearQuantities}
+            >
+              <Icon name="close-circle-outline" size={16} color="#6B7280" />
+              <Text style={styles.clearButtonText}>Limpar tudo</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
         {totalTickets > 0 && (
@@ -450,27 +500,77 @@ export default function TicketSelectionScreen({ route, navigation }) {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {totalTickets > 0 && priceCalculation && (
-        <View style={styles.footer}>
-          <PriceBreakdown calculation={priceCalculation} />
+      {/* Footer */}
+      <View style={styles.footer}>
+        {/* Botão Calcular Preço - sempre disponível se houver tickets */}
+        {totalTickets > 0 && (
           <TouchableOpacity
-            style={styles.checkoutButton}
-            onPress={handleCheckout}
+            style={styles.calculateButton}
+            onPress={calculateTotalPrice}
+            disabled={calculating}
           >
             <LinearGradient
-              colors={['#6366F1', '#8B5CF6']}
-              style={styles.checkoutGradient}
+              colors={['#10B981', '#059669']}
+              style={styles.calculateGradient}
             >
-              <Text style={styles.checkoutButtonText}>
-                Continuar para pagamento
-              </Text>
-              <Text style={styles.checkoutTotal}>
-                R$ {priceCalculation.finalPrice?.toFixed(2)}
-              </Text>
+              {calculating ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <>
+                  <Icon name="calculator" size={20} color="#FFF" />
+                  <Text style={styles.calculateButtonText}>
+                    {hasCalculated ? 'Recalcular Preço' : 'Calcular Preço'}
+                  </Text>
+                </>
+              )}
             </LinearGradient>
           </TouchableOpacity>
-        </View>
-      )}
+        )}
+
+        {/* Resumo do preço e botão checkout - SÓ APARECE SE JÁ CALCULOU */}
+        {priceCalculation && hasCalculated && (
+          <>
+            <PriceBreakdown calculation={priceCalculation} />
+
+            {/* ✅ Botão de aviso se precisa recalcular */}
+            {JSON.stringify(quantities) !== JSON.stringify(tempQuantities) && (
+              <View style={styles.warningRecalc}>
+                <Icon name="alert-circle" size={16} color="#F59E0B" />
+                <Text style={styles.warningRecalcText}>
+                  As quantidades mudaram. Clique em "Recalcular Preço"
+                </Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={styles.checkoutButton}
+              onPress={handleCheckout}
+            >
+              <LinearGradient
+                colors={['#6366F1', '#8B5CF6']}
+                style={styles.checkoutGradient}
+              >
+                <Text style={styles.checkoutButtonText}>
+                  Continuar para pagamento
+                </Text>
+                <Text style={styles.checkoutTotal}>
+                  {priceCalculation.finalPrice?.toLocaleString()} MT
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* Mensagem quando tem tickets mas não calculou */}
+        {totalTickets > 0 && !hasCalculated && (
+          <View style={styles.calculateWarning}>
+            <Icon name="calculator" size={24} color="#9CA3AF" />
+            <Text style={styles.calculateWarningText}>
+              Clique em "Calcular Preço" para ver o valor com descontos
+            </Text>
+          </View>
+        )}
+      </View>
     </View>
   );
 }

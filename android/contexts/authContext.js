@@ -1,13 +1,21 @@
 // contexts/AuthContext.js
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from '../services/api';
+import { auth, api, registerSignOutCallback } from '../services/api';
 
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Registrar callback de logout para o interceptor
+  useEffect(() => {
+    registerSignOutCallback(signOut);
+    return () => {
+      registerSignOutCallback(null);
+    };
+  }, []);
 
   // Verifica se já existe usuário logado ao iniciar o app
   useEffect(() => {
@@ -22,6 +30,7 @@ export function AuthProvider({ children }) {
       if (token && userData) {
         // Configura o token no axios
         auth.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         setUser(JSON.parse(userData));
       }
     } catch (error) {
@@ -41,6 +50,7 @@ export function AuthProvider({ children }) {
 
       // Configura o axios
       auth.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       // Atualiza o estado
       setUser(userData);
@@ -54,11 +64,14 @@ export function AuthProvider({ children }) {
 
   async function signOut() {
     try {
+      console.log('🚪 Executando logout...');
+
       // Remove do storage
       await AsyncStorage.multiRemove(['token', 'user']);
 
       // Remove do axios
       delete auth.defaults.headers.common['Authorization'];
+      delete api.defaults.headers.common['Authorization'];
 
       // Limpa o estado
       setUser(null);
@@ -77,7 +90,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Este é o useAuth que você vai usar nos componentes
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

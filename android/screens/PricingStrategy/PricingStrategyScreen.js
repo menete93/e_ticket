@@ -1,3 +1,4 @@
+// screens/organizer/ApplyStrategiesScreen.jsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ScrollView,
@@ -14,12 +15,13 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import { getEvents } from './../../services/eventService';
+import { getMyEvents } from './../../services/eventService';
 import {
   STRATEGY_METADATA,
   formatStrategyFromBackend,
 } from './../../constants/pricingStrategyMapper';
 import { getTickets } from './../../services/ticketService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   getPricingStrategies,
   applyMultipleStrategiesToEvent,
@@ -259,6 +261,8 @@ export default function ApplyStrategiesScreen({ navigation }) {
   const [activeStep, setActiveStep] = useState(1);
   const [strategyCategoryMap, setStrategyCategoryMap] = useState({});
   const [strategyConflicts, setStrategyConflicts] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const [user, setUser] = useState(null);
 
   // Estados para o modal de detalhes
   const [showStrategyDetails, setShowStrategyDetails] = useState(false);
@@ -331,16 +335,53 @@ export default function ApplyStrategiesScreen({ navigation }) {
     return details;
   }, []);
 
-  // Fetch eventos
+  // Carregar usuário
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setUserId(parsedUser.referenceId);
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+    }
+  };
+
+  // Fetch eventos usando referenceId
   const fetchEvents = useCallback(async () => {
     try {
-      const response = await getEvents();
-      setEvents(response.data || response || []);
+      if (!userId) {
+        console.log('Aguardando userId...');
+        return;
+      }
+
+      console.log('🔍 Buscando eventos para referenceId:', userId);
+
+      const response = await getMyEvents(userId);
+
+      let eventsList = [];
+      if (Array.isArray(response)) {
+        eventsList = response;
+      } else if (response?.data && Array.isArray(response.data)) {
+        eventsList = response.data;
+      } else {
+        eventsList = [];
+      }
+
+      console.log(`✅ Encontrados ${eventsList.length} eventos`);
+      setEvents(eventsList);
     } catch (error) {
       console.error('Erro ao buscar eventos:', error);
       Alert.alert('Erro', 'Não foi possível carregar os eventos');
+      setEvents([]);
     }
-  }, []);
+  }, [userId]);
 
   // Fetch estratégias
   const fetchPricingStrategies = useCallback(async () => {
@@ -388,13 +429,15 @@ export default function ApplyStrategiesScreen({ navigation }) {
 
   // Dados iniciais
   useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      await Promise.all([fetchEvents(), fetchPricingStrategies()]);
-      setLoading(false);
-    };
-    loadInitialData();
-  }, [fetchEvents, fetchPricingStrategies]);
+    if (userId) {
+      const loadInitialData = async () => {
+        setLoading(true);
+        await Promise.all([fetchEvents(), fetchPricingStrategies()]);
+        setLoading(false);
+      };
+      loadInitialData();
+    }
+  }, [userId, fetchEvents, fetchPricingStrategies]);
 
   // Atualizar tickets quando evento mudar
   useEffect(() => {
@@ -407,16 +450,7 @@ export default function ApplyStrategiesScreen({ navigation }) {
   // Debug: log das estratégias carregadas
   useEffect(() => {
     if (pricingStrategies.length > 0) {
-      console.log('📊 Estratégias carregadas:');
-      pricingStrategies.forEach(s => {
-        const details = STRATEGY_DETAILS[s.originalKey];
-        console.log(`- ${s.strategyName}:`, {
-          key: s.originalKey,
-          hasDetails: !!details,
-          color: details?.color,
-          hasGradient: !!details?.gradient,
-        });
-      });
+      console.log('📊 Estratégias carregadas:', pricingStrategies.length);
     }
   }, [pricingStrategies]);
 
@@ -526,6 +560,57 @@ export default function ApplyStrategiesScreen({ navigation }) {
   );
 
   // Aplicar estratégias
+  const proceedWithApplication = useCallback(async () => {
+    try {
+      setApplying(true);
+
+      const strategyAssignments = selectedStrategies.map(strategy => ({
+        strategyId: strategy.id,
+        targetCategories: strategyCategoryMap[strategy.id] || [],
+      }));
+
+      const payload = {
+        eventId: selectedEvent.id,
+        strategyAssignments,
+      };
+
+      console.log('📦 Payload enviado:', JSON.stringify(payload, null, 2));
+
+      const results = await applyMultipleStrategiesToEvent(payload);
+
+      console.log('✅ Estratégias criadas:', results.length);
+
+      const formattedResults = results.map(strategy => ({
+        strategyId: strategy.id,
+        strategyName: strategy.name,
+        strategyType: strategy.strategyType,
+        category: strategy.specificCategory || 'Todas as categorias',
+        status: 'SUCCESS',
+        message: `Estratégia "${strategy.name}" aplicada com sucesso`,
+        ticketsAffected: 0,
+      }));
+
+      setApplicationResults(formattedResults);
+      setShowResults(true);
+    } catch (error) {
+      console.error('❌ Erro detalhado:', error);
+
+      let errorMessage = 'Não foi possível aplicar as estratégias';
+
+      if (error.response?.data) {
+        if (Array.isArray(error.response.data)) {
+          errorMessage = error.response.data.map(e => e.message).join('\n');
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+
+      Alert.alert('Erro', errorMessage);
+    } finally {
+      setApplying(false);
+    }
+  }, [selectedEvent, selectedStrategies, strategyCategoryMap]);
+
   const applyStrategies = useCallback(async () => {
     if (!selectedEvent) {
       Alert.alert('Atenção', 'Selecione um evento');
@@ -577,63 +662,6 @@ export default function ApplyStrategiesScreen({ navigation }) {
     proceedWithApplication,
     strategyCategoryMap,
   ]);
-
-  // Proceder com aplicação
-  // Dentro do componente ApplyStrategiesScreen
-
-  const proceedWithApplication = useCallback(async () => {
-    try {
-      setApplying(true);
-
-      const strategyAssignments = selectedStrategies.map(strategy => ({
-        strategyId: strategy.id,
-        targetCategories: strategyCategoryMap[strategy.id] || [],
-      }));
-
-      const payload = {
-        eventId: selectedEvent.id,
-        strategyAssignments,
-      };
-
-      console.log('📦 Payload enviado:', JSON.stringify(payload, null, 2));
-
-      // A resposta já é o array de estratégias criadas
-      const results = await applyMultipleStrategiesToEvent(payload);
-
-      console.log('✅ Estratégias criadas:', results.length);
-
-      // Formatar resultados para exibição
-      const formattedResults = results.map(strategy => ({
-        strategyId: strategy.id,
-        strategyName: strategy.name,
-        strategyType: strategy.strategyType,
-        category: strategy.specificCategory || 'Todas as categorias',
-        status: 'SUCCESS',
-        message: `Estratégia "${strategy.name}" aplicada com sucesso`,
-        ticketsAffected: 0, // Você pode calcular isso se necessário
-      }));
-
-      setApplicationResults(formattedResults);
-      setShowResults(true);
-    } catch (error) {
-      console.error('❌ Erro detalhado:', error);
-
-      // Tratamento de erro melhorado
-      let errorMessage = 'Não foi possível aplicar as estratégias';
-
-      if (error.response?.data) {
-        if (Array.isArray(error.response.data)) {
-          errorMessage = error.response.data.map(e => e.message).join('\n');
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        }
-      }
-
-      Alert.alert('Erro', errorMessage);
-    } finally {
-      setApplying(false);
-    }
-  }, [selectedEvent, selectedStrategies, strategyCategoryMap]);
 
   // Limpar tudo
   const clearAll = useCallback(() => {
@@ -1502,7 +1530,6 @@ export default function ApplyStrategiesScreen({ navigation }) {
             <FlatList
               data={applicationResults}
               renderItem={({ item, index }) => {
-                // Buscar detalhes da estratégia para o gradiente
                 const strategy = pricingStrategies.find(
                   s => s.id === item.strategyId,
                 );

@@ -211,4 +211,67 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: 6,
   },
+
+  filterBar: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  filterBarContent: {
+    paddingVertical: 8,
+    gap: 12,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    gap: 6,
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  filterBadge: {
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 4,
+  },
+  filterBadgeText: {
+    fontSize: 10,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionCount: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  eventCardInactive: {
+    backgroundColor: '#F9FAFB',
+    opacity: 0.8,
+  },
+  eventNameInactive: {
+    color: '#9CA3AF',
+  },
+  eventTextInactive: {
+    color: '#9CA3AF',
+  },
+  blockedReason: {
+    fontSize: 11,
+    color: '#F59E0B',
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
 });

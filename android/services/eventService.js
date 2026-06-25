@@ -22,6 +22,12 @@ export const getMyEvents = async referenceId => {
   return response.data;
 };
 
+// Buscar todos meus eventos (apenas do organizador logado)
+export const getMyAllEvents = async referenceId => {
+  const response = await api.get(`/event/findAll/organizer/${referenceId}`);
+  return response.data;
+};
+
 // Atualizar evento
 export const updateEvent = async (eventId, eventData) => {
   const response = await api.put(`/event/${eventId}`, eventData);

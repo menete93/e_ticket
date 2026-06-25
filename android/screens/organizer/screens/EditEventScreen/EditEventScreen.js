@@ -3,8 +3,8 @@
  * TELA DE EDIÇÃO DE EVENTO
  *
  * REGRAS DE NEGÓCIO:
- * 1. Apenas eventos com data futura ou hoje podem ser editados
- * 2. Eventos passados são bloqueados (read-only)
+ * 1. Apenas eventos com data futura podem ser editados (não permite edição no dia do evento)
+ * 2. Eventos passados ou do dia atual são bloqueados (read-only)
  * 3. Mudança de data do evento afeta automaticamente as datas de venda dos tickets
  * 4. Se já existem ingressos vendidos, algumas alterações são restritas
  * 5. Alterar de gratuito para pago requer configuração de preços depois
@@ -78,7 +78,7 @@ const EditEventScreen = ({ navigation, route }) => {
   const originalIsFree = event?.isFree ?? false;
   const originalEventDate = event?.eventDate ? new Date(event.eventDate) : null;
 
-  // Capacidade atual (se não definida, considera como "Ilimitada")
+  // Capacidade atual
   const currentMaxCapacity = event?.maxAttendees || 'Ilimitada';
   const currentMinCapacity = event?.minAttendees || 'Não definida';
 
@@ -90,16 +90,14 @@ const EditEventScreen = ({ navigation, route }) => {
 
   const occupancyPercentage = getOccupancyPercentage();
 
-  // Determinar cor do indicador de ocupação
   const getOccupancyColor = () => {
     if (occupancyPercentage === null) return '#6B7280';
-    if (occupancyPercentage >= 90) return '#EF4444'; // Vermelho - lotado
-    if (occupancyPercentage >= 70) return '#F59E0B'; // Amarelo - quase lotado
-    if (occupancyPercentage >= 50) return '#10B981'; // Verde - bom
-    return '#3B82F6'; // Azul - tranquilo
+    if (occupancyPercentage >= 90) return '#EF4444';
+    if (occupancyPercentage >= 70) return '#F59E0B';
+    if (occupancyPercentage >= 50) return '#10B981';
+    return '#3B82F6';
   };
 
-  // Determinar ícone do indicador
   const getOccupancyIcon = () => {
     if (occupancyPercentage === null) return 'help-circle-outline';
     if (occupancyPercentage >= 90) return 'alert-circle';
@@ -110,14 +108,39 @@ const EditEventScreen = ({ navigation, route }) => {
 
   // ==================== VALIDAÇÕES DE NEGÓCIO ====================
 
+  /**
+   * REGRA 1: Verifica se o evento pode ser editado
+   * Eventos que já ocorreram ou estão no dia atual NÃO podem ser editados
+   */
   const canEditEvent = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const eventDateTime = new Date(eventDate);
-    eventDateTime.setHours(0, 0, 0, 0);
-    return eventDateTime >= today;
+
+    const eventDateObj = new Date(eventDate);
+    eventDateObj.setHours(0, 0, 0, 0);
+
+    const endTimeDate = new Date(endTime);
+    const now = new Date();
+
+    // Verificar se o evento já terminou (data passada OU data atual com horário já passado)
+    if (eventDateObj < today) {
+      return false;
+    }
+
+    // Se é hoje, verificar se o horário de término já passou
+    if (eventDateObj.toDateString() === today.toDateString()) {
+      if (endTimeDate < now) {
+        return false;
+      }
+    }
+
+    return true;
   };
 
+  /**
+   * REGRA 2: Verifica se a data selecionada é válida
+   * Não pode selecionar data no passado
+   */
   const validateEventDate = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -131,6 +154,10 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
+  /**
+   * REGRA 3: Valida os horários
+   * Início deve ser antes do fim
+   */
   const validateTimes = () => {
     if (startTime >= endTime) {
       Alert.alert(
@@ -142,6 +169,9 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
+  /**
+   * REGRA 4: Valida capacidades
+   */
   const validateCapacity = () => {
     const max = maxAttendees ? parseInt(maxAttendees) : null;
     const min = minAttendees ? parseInt(minAttendees) : null;
@@ -175,6 +205,9 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
+  /**
+   * REGRA 5: Valida prazo de inscrição
+   */
   const validateRegistrationDeadline = () => {
     if (!registrationDeadline) return true;
 
@@ -197,6 +230,9 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
+  /**
+   * REGRA 6: Verifica impacto da mudança de data nos tickets
+   */
   const checkDateChangeImpact = () => {
     if (!originalEventDate) return true;
 
@@ -229,19 +265,12 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
-  // screens/organizer/EditEventScreen.js
-  // ... (todo o código anterior permanece igual até a função checkFreeStatusChange)
-
   /**
-   * REGRA 7: Verifica mudança de gratuito para pago
-   * Se mudar de gratuito para pago, organizador precisa configurar preços depois
-   * Se mudar de pago para gratuito, só alerta se já tiver vendas
+   * REGRA 7: Verifica mudança de status gratuito/pago
    */
   const checkFreeStatusChange = () => {
-    // Se não mudou o status, ok
     if (isFree === originalIsFree) return true;
 
-    // Mudando de gratuito para pago
     if (!isFree && originalIsFree) {
       return new Promise(resolve => {
         Alert.alert(
@@ -261,9 +290,7 @@ const EditEventScreen = ({ navigation, route }) => {
       });
     }
 
-    // Mudando de pago para gratuito - SÓ ALERTA SE TIVER VENDAS
     if (isFree && !originalIsFree) {
-      // Verifica se já existe pelo menos um bilhete vendido
       if (soldTickets > 0) {
         return new Promise(resolve => {
           Alert.alert(
@@ -287,7 +314,6 @@ const EditEventScreen = ({ navigation, route }) => {
           );
         });
       } else {
-        // Sem vendas, apenas informa, mas não bloqueia
         return new Promise(resolve => {
           Alert.alert(
             'ℹ️ Alteração de Tipo',
@@ -310,17 +336,53 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
-  const validateAll = async () => {
-    if (!eventName.trim()) {
-      Alert.alert('Erro', 'Nome do evento é obrigatório');
+  /**
+   * REGRA 8: Valida nome e descrição (min 3, max 200 e min 10, max 2000)
+   */
+  const validateTextFields = () => {
+    // Nome: min 3, max 200
+    if (!eventName || eventName.trim().length === 0) {
+      Alert.alert('Erro', 'O nome do evento é obrigatório');
+      return false;
+    }
+    if (eventName.trim().length < 3) {
+      Alert.alert('Erro', 'O nome do evento deve ter pelo menos 3 caracteres');
+      return false;
+    }
+    if (eventName.length > 200) {
+      Alert.alert('Erro', 'O nome do evento não pode exceder 200 caracteres');
       return false;
     }
 
+    // Descrição: min 10, max 2000
+    if (!description || description.trim().length === 0) {
+      Alert.alert('Erro', 'A descrição do evento é obrigatória');
+      return false;
+    }
+    if (description.trim().length < 10) {
+      Alert.alert('Erro', 'A descrição deve ter pelo menos 10 caracteres');
+      return false;
+    }
+    if (description.length > 2000) {
+      Alert.alert('Erro', 'A descrição não pode exceder 2000 caracteres');
+      return false;
+    }
+
+    return true;
+  };
+
+  /**
+   * REGRA 9: Validação completa antes de salvar
+   */
+  const validateAll = async () => {
+    // Validações de campo
+    if (!validateTextFields()) return false;
     if (!validateEventDate()) return false;
     if (!validateTimes()) return false;
     if (!validateCapacity()) return false;
     if (!validateRegistrationDeadline()) return false;
 
+    // Validações com confirmação do usuário
     const dateImpactValid = await checkDateChangeImpact();
     if (!dateImpactValid) return false;
 
@@ -330,17 +392,35 @@ const EditEventScreen = ({ navigation, route }) => {
     return true;
   };
 
-  // EditEventScreen.js - handleUpdateEvent
-
-  // screens/organizer/EditEventScreen.js
-  // ... (importações e estados mantidos)
-
+  /**
+   * HANDLE UPDATE EVENT
+   */
   const handleUpdateEvent = async () => {
+    // Verificar se pode editar (evento não pode estar no dia ou já ter terminado)
     if (!canEditEvent()) {
-      Alert.alert(
-        'Edição não permitida',
-        'Este evento já ocorreu e não pode mais ser editado.',
-      );
+      const eventDateObj = new Date(eventDate);
+      const today = new Date();
+      const endTimeDate = new Date(endTime);
+
+      if (
+        eventDateObj.toDateString() === today.toDateString() &&
+        endTimeDate < today
+      ) {
+        Alert.alert(
+          'Edição não permitida',
+          'Este evento já terminou. Não é possível editar eventos que já foram realizados.',
+        );
+      } else if (eventDateObj.toDateString() === today.toDateString()) {
+        Alert.alert(
+          'Edição não permitida',
+          'Não é possível editar eventos que ocorrem hoje. As alterações devem ser feitas com pelo menos 1 dia de antecedência.',
+        );
+      } else {
+        Alert.alert(
+          'Edição não permitida',
+          'Este evento já ocorreu e não pode mais ser editado.',
+        );
+      }
       return;
     }
 
@@ -350,23 +430,25 @@ const EditEventScreen = ({ navigation, route }) => {
     try {
       setLoading(true);
 
-      // 🔧 Enviar APENAS os campos que foram alterados
       const eventData = {};
 
-      // Verifica cada campo e só adiciona se foi modificado
+      // Nome
       if (eventName !== event?.name) {
         eventData.name = eventName.trim();
       }
 
+      // Descrição
       if (description !== event?.description) {
         eventData.description = description.trim();
       }
 
+      // Data do Evento
       const newEventDate = eventDate.toISOString();
       if (newEventDate !== event?.eventDate) {
         eventData.eventDate = newEventDate;
       }
 
+      // Horários
       const newStartTime = startTime.toISOString();
       if (newStartTime !== event?.startTime) {
         eventData.startTime = newStartTime;
@@ -377,6 +459,7 @@ const EditEventScreen = ({ navigation, route }) => {
         eventData.endTime = newEndTime;
       }
 
+      // Capacidades
       const newMaxAttendees = maxAttendees ? parseInt(maxAttendees) : null;
       if (newMaxAttendees !== event?.maxAttendees) {
         eventData.maxAttendees = newMaxAttendees;
@@ -387,6 +470,7 @@ const EditEventScreen = ({ navigation, route }) => {
         eventData.minAttendees = newMinAttendees;
       }
 
+      // Configurações
       if (isPublic !== event?.isPublic) {
         eventData.isPublic = isPublic;
       }
@@ -399,6 +483,7 @@ const EditEventScreen = ({ navigation, route }) => {
         eventData.isFree = isFree;
       }
 
+      // Prazo de inscrição
       const newDeadline = registrationDeadline
         ? registrationDeadline.toISOString()
         : null;
@@ -406,7 +491,6 @@ const EditEventScreen = ({ navigation, route }) => {
         eventData.registrationDeadline = newDeadline;
       }
 
-      // Se não houver alterações, alerta e retorna
       if (Object.keys(eventData).length === 0) {
         Alert.alert('Info', 'Nenhuma alteração foi feita.');
         setLoading(false);
@@ -414,7 +498,7 @@ const EditEventScreen = ({ navigation, route }) => {
       }
 
       console.log(
-        '📤 Enviando apenas campos alterados:',
+        '📤 Enviando atualização:',
         JSON.stringify(eventData, null, 2),
       );
 
@@ -440,7 +524,7 @@ const EditEventScreen = ({ navigation, route }) => {
                   { text: 'OK', onPress: () => navigation.goBack() },
                 ]);
               } catch (error) {
-                console.error('❌ Erro detalhado:', error.response?.data);
+                console.error('❌ Erro:', error.response?.data);
                 Alert.alert(
                   'Erro',
                   error.response?.data?.message || 'Falha ao atualizar evento',
@@ -458,8 +542,6 @@ const EditEventScreen = ({ navigation, route }) => {
     }
   };
 
-  // ... (resto do componente mantido)
-
   const formatDate = date => {
     if (!date) return 'Selecionar data';
     return date.toLocaleDateString('pt-BR');
@@ -473,15 +555,20 @@ const EditEventScreen = ({ navigation, route }) => {
     });
   };
 
-  const isEventPast = () => {
+  const isEventPastOrToday = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const eventDateTime = new Date(eventDate);
     eventDateTime.setHours(0, 0, 0, 0);
-    return eventDateTime < today;
-  };
 
-  // ==================== RENDER ====================
+    if (eventDateTime < today) return true;
+    if (eventDateTime.toDateString() === today.toDateString()) {
+      const now = new Date();
+      const endTimeDate = new Date(endTime);
+      return endTimeDate < now;
+    }
+    return false;
+  };
 
   if (!event) {
     return (
@@ -493,6 +580,8 @@ const EditEventScreen = ({ navigation, route }) => {
       </View>
     );
   }
+
+  const isReadOnly = isEventPastOrToday();
 
   return (
     <ScrollView style={styles.container}>
@@ -514,8 +603,9 @@ const EditEventScreen = ({ navigation, route }) => {
       </LinearGradient>
 
       <View style={styles.form}>
-        {/* ==================== INFORMAÇÕES BÁSICAS ==================== */}
+        {/* Informações Básicas */}
         <Text style={styles.sectionTitle}>Informações Básicas</Text>
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Nome do Evento *</Text>
           <TextInput
@@ -523,9 +613,11 @@ const EditEventScreen = ({ navigation, route }) => {
             value={eventName}
             onChangeText={setEventName}
             placeholder="Digite o nome do evento"
-            editable={!isEventPast()}
+            editable={!isReadOnly}
           />
+          <Text style={styles.helperText}>Mínimo 3, máximo 200 caracteres</Text>
         </View>
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Descrição</Text>
           <TextInput
@@ -535,10 +627,14 @@ const EditEventScreen = ({ navigation, route }) => {
             placeholder="Descreva o evento..."
             multiline
             numberOfLines={4}
-            editable={!isEventPast()}
+            editable={!isReadOnly}
           />
+          <Text style={styles.helperText}>
+            Mínimo 10, máximo 2000 caracteres
+          </Text>
         </View>
-        {/* ==================== CAPACIDADE ATUAL (INDICADOR) ==================== */}
+
+        {/* Capacidade Atual */}
         <View style={styles.capacityIndicatorCard}>
           <Text style={styles.capacityIndicatorTitle}>
             📊 Capacidade Atual do Evento
@@ -561,7 +657,6 @@ const EditEventScreen = ({ navigation, route }) => {
             </View>
           </View>
 
-          {/* Barra de ocupação */}
           {occupancyPercentage !== null && (
             <View style={styles.occupancySection}>
               <View style={styles.occupancyHeader}>
@@ -594,22 +689,6 @@ const EditEventScreen = ({ navigation, route }) => {
                   ]}
                 />
               </View>
-
-              <Text style={styles.occupancyDescription}>
-                {occupancyPercentage >= 90 &&
-                  '⚠️ Evento quase lotado! Considere aumentar a capacidade.'}
-                {occupancyPercentage >= 70 &&
-                  occupancyPercentage < 90 &&
-                  '📈 Boa procura! Acompanhe as vendas.'}
-                {occupancyPercentage >= 50 &&
-                  occupancyPercentage < 70 &&
-                  '✅ Vendas dentro do esperado.'}
-                {occupancyPercentage < 50 &&
-                  occupancyPercentage > 0 &&
-                  '📉 Ainda há muitos ingressos disponíveis.'}
-                {occupancyPercentage === 0 &&
-                  '🎫 Nenhum ingresso vendido ainda.'}
-              </Text>
             </View>
           )}
 
@@ -638,7 +717,8 @@ const EditEventScreen = ({ navigation, route }) => {
             </View>
           </View>
         </View>
-        {/* ==================== EDIÇÃO DE CAPACIDADE ==================== */}
+
+        {/* Edição de Capacidade */}
         <Text style={styles.sectionTitle}>✏️ Ajustar Capacidade</Text>
         <View style={styles.capacityEditCard}>
           <View style={styles.row}>
@@ -650,21 +730,11 @@ const EditEventScreen = ({ navigation, route }) => {
                 onChangeText={setMaxAttendees}
                 placeholder="Deixe vazio para ilimitado"
                 keyboardType="numeric"
-                editable={!isEventPast()}
+                editable={!isReadOnly}
               />
               {soldTickets > 0 && (
                 <Text style={styles.warningHelper}>
-                  ⚠️ Já vendidos: {soldTickets} ingressos. A capacidade não pode
-                  ser menor que isso.
-                </Text>
-              )}
-              {maxAttendees && parseInt(maxAttendees) > 0 && (
-                <Text style={styles.infoHelper}>
-                  ✨ Nova capacidade: {parseInt(maxAttendees)} pessoas
-                  {soldTickets > 0 &&
-                    ` (${((soldTickets / parseInt(maxAttendees)) * 100).toFixed(
-                      1,
-                    )}% de ocupação)`}
+                  ⚠️ Já vendidos: {soldTickets} ingressos.
                 </Text>
               )}
             </View>
@@ -677,49 +747,44 @@ const EditEventScreen = ({ navigation, route }) => {
                 onChangeText={setMinAttendees}
                 placeholder="Deixe vazio para não definir"
                 keyboardType="numeric"
-                editable={!isEventPast()}
+                editable={!isReadOnly}
               />
             </View>
           </View>
-
-          {/* Recomendação baseada na ocupação atual */}
-          {occupancyPercentage !== null && occupancyPercentage > 80 && (
-            <View style={styles.recommendationBox}>
-              <Ionicons name="bulb-outline" size={20} color="#F59E0B" />
-              <Text style={styles.recommendationText}>
-                💡 Recomendação: Considere aumentar a capacidade máxima para
-                acompanhar a demanda. Atualmente você está com{' '}
-                {occupancyPercentage.toFixed(0)}% de ocupação.
-              </Text>
-            </View>
-          )}
         </View>
-        {/* ==================== DATAS E HORÁRIOS ==================== */}
+
+        {/* Datas e Horários */}
         <Text style={styles.sectionTitle}>Datas e Horários</Text>
+
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Data do Evento *</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowEventDatePicker(true)}
-            disabled={isEventPast()}
+            disabled={isReadOnly}
           >
             <Ionicons name="calendar" size={20} color="#4F46E5" />
             <Text style={styles.dateButtonText}>{formatDate(eventDate)}</Text>
           </TouchableOpacity>
           {totalTickets > 0 && (
             <Text style={styles.helperText}>
-              ⚠️ Alterar a data afetará a data de venda de {totalTickets}{' '}
-              ticket(s)
+              ⚠️ Alterar a data afetará {totalTickets} ticket(s)
+            </Text>
+          )}
+          {new Date(eventDate).toDateString() === new Date().toDateString() && (
+            <Text style={styles.warningHelper}>
+              ⚠️ Evento ocorre hoje. Não é possível editar após o término.
             </Text>
           )}
         </View>
+
         <View style={styles.row}>
           <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
             <Text style={styles.label}>Hora de Início</Text>
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowStartTimePicker(true)}
-              disabled={isEventPast()}
+              disabled={isReadOnly}
             >
               <Ionicons name="time" size={20} color="#10B981" />
               <Text style={styles.dateButtonText}>{formatTime(startTime)}</Text>
@@ -731,7 +796,7 @@ const EditEventScreen = ({ navigation, route }) => {
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowEndTimePicker(true)}
-              disabled={isEventPast()}
+              disabled={isReadOnly}
             >
               <Ionicons name="time" size={20} color="#EF4444" />
               <Text style={styles.dateButtonText}>{formatTime(endTime)}</Text>
@@ -739,20 +804,19 @@ const EditEventScreen = ({ navigation, route }) => {
           </View>
         </View>
 
-        {/* ==================== CONFIGURAÇÕES ==================== */}
+        {/* Configurações */}
         <Text style={styles.sectionTitle}>Configurações</Text>
+
         <View style={styles.switchGroup}>
           <View style={styles.switchRow}>
             <View>
               <Text style={styles.label}>Evento Público</Text>
-              <Text style={styles.helperText}>
-                Visível para todos os usuários
-              </Text>
+              <Text style={styles.helperText}>Visível para todos</Text>
             </View>
             <Switch
               value={isPublic}
               onValueChange={setIsPublic}
-              disabled={isEventPast()}
+              disabled={isReadOnly}
               trackColor={{ false: '#767577', true: '#81b0ff' }}
               thumbColor={isPublic ? '#4F46E5' : '#f4f3f4'}
             />
@@ -766,7 +830,7 @@ const EditEventScreen = ({ navigation, route }) => {
             <Switch
               value={isFeatured}
               onValueChange={setIsFeatured}
-              disabled={isEventPast()}
+              disabled={isReadOnly}
               trackColor={{ false: '#767577', true: '#81b0ff' }}
               thumbColor={isFeatured ? '#F59E0B' : '#f4f3f4'}
             />
@@ -778,40 +842,35 @@ const EditEventScreen = ({ navigation, route }) => {
               <Text style={styles.helperText}>
                 {isFree ? 'Ingressos sem custo' : 'Evento com ingressos pagos'}
               </Text>
-              {/* Indicador de impacto da mudança */}
               {!isFree && originalIsFree && (
                 <Text style={styles.warningHelper}>
-                  ⚠️ Após salvar, configure os preços dos ingressos
+                  ⚠️ Configure os preços após salvar
                 </Text>
               )}
               {isFree && !originalIsFree && soldTickets > 0 && (
                 <Text style={styles.warningHelper}>
-                  ⚠️ Atenção: {soldTickets} ingresso(s) já foram vendidos. Não
-                  há reembolso automático.
-                </Text>
-              )}
-              {isFree && !originalIsFree && soldTickets === 0 && (
-                <Text style={styles.infoHelper}>
-                  ℹ️ Nenhum ingresso vendido ainda. Alteração segura.
+                  ⚠️ {soldTickets} ingresso(s) vendidos. Sem reembolso
+                  automático.
                 </Text>
               )}
             </View>
             <Switch
               value={isFree}
               onValueChange={setIsFree}
-              disabled={isEventPast()}
+              disabled={isReadOnly}
               trackColor={{ false: '#767577', true: '#81b0ff' }}
               thumbColor={isFree ? '#10B981' : '#f4f3f4'}
             />
           </View>
         </View>
-        {/* ==================== PRAZO DE INSCRIÇÃO ==================== */}
+
+        {/* Prazo de Inscrição */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Prazo de Inscrição</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDeadlinePicker(true)}
-            disabled={isEventPast()}
+            disabled={isReadOnly}
           >
             <Ionicons name="calendar" size={20} color="#8B5CF6" />
             <Text style={styles.dateButtonText}>
@@ -820,16 +879,14 @@ const EditEventScreen = ({ navigation, route }) => {
                 : 'Sem data definida'}
             </Text>
           </TouchableOpacity>
-          {registrationDeadline && !isEventPast() && (
+          {registrationDeadline && !isReadOnly && (
             <TouchableOpacity onPress={() => setRegistrationDeadline(null)}>
               <Text style={styles.clearButtonText}>Remover data limite</Text>
             </TouchableOpacity>
           )}
-          <Text style={styles.helperText}>
-            Após esta data, novos ingressos não poderão ser comprados
-          </Text>
         </View>
-        {/* ==================== RESUMO PARA DECISÃO ==================== */}
+
+        {/* Resumo para Decisão */}
         <View style={styles.decisionSummary}>
           <Text style={styles.decisionTitle}>🎯 Resumo para sua decisão</Text>
 
@@ -837,7 +894,7 @@ const EditEventScreen = ({ navigation, route }) => {
             <Ionicons name="people" size={18} color="#4F46E5" />
             <Text style={styles.decisionLabel}>Capacidade atual:</Text>
             <Text style={styles.decisionValue}>
-              {soldTickets} vendidos de{' '}
+              {soldTickets} vendidos /{' '}
               {currentMaxCapacity === 'Ilimitada' ? '∞' : currentMaxCapacity}
             </Text>
           </View>
@@ -859,20 +916,13 @@ const EditEventScreen = ({ navigation, route }) => {
             <Text style={styles.decisionLabel}>Data do evento:</Text>
             <Text style={styles.decisionValue}>
               {formatDate(eventDate)}
-              {isEventPast() ? ' (Realizado)' : ' (Futuro)'}
-            </Text>
-          </View>
-
-          <View style={styles.decisionRow}>
-            <Ionicons name="cash" size={18} color="#EF4444" />
-            <Text style={styles.decisionLabel}>Tipo:</Text>
-            <Text style={styles.decisionValue}>
-              {isFree ? 'Evento Gratuito' : 'Evento Pago'}
+              {isReadOnly ? ' (Encerrado)' : ' (Futuro)'}
             </Text>
           </View>
         </View>
-        {/* ==================== BOTÕES ==================== */}
-        {!isEventPast() ? (
+
+        {/* Botões */}
+        {!isReadOnly ? (
           <TouchableOpacity
             style={styles.updateButton}
             onPress={handleUpdateEvent}
@@ -894,6 +944,7 @@ const EditEventScreen = ({ navigation, route }) => {
             </Text>
           </View>
         )}
+
         <TouchableOpacity
           style={styles.cancelButton}
           onPress={() => navigation.goBack()}
